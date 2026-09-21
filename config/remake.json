@@ -21,5 +21,18 @@
     "GBA compatibility"
   ],
   "legacyGbGbcEngineWork": "research-only-not-runtime",
-  "romBinariesCommitted": false
+  "romBinariesCommitted": false,
+  "japanSourceSurvey": {
+    "coordinationRepository": "SakuraiTsubaki/EMERALD",
+    "census": "manifests/japan-20-rom-census.csv",
+    "revisionSummary": "manifests/japan-revision-summary.json",
+    "survey": "research/japan-gen1-gen2-gen3-survey.md",
+    "scanner": "tools/scan_japan_rom_set.py",
+    "romCount": 20,
+    "generationCounts": {
+      "gen1": 9,
+      "gen2": 5,
+      "gen3": 6
+    }
+  }
 }
