@@ -1,0 +1,8 @@
+filename,region,language,revision,observed_file_size_bytes,header_nominal_sram_bytes,observed_extra_bytes,raw_bytes_status,evidence_status,notes
+Pocket Monsters - Crystal Version (Japan).sav,Japan,Japanese,0,65580,65536,44,not_mounted_in_active_runtime,prior_uploaded_file_metadata,"0x1002C total = 0x10000 nominal SRAM + 0x2C extra bytes; extra-byte placement/meaning not claimed until raw bytes are re-read"
+"Pokemon - Crystal Version (USA, Europe).sav",USA-Europe,English,0,32812,32768,44,not_mounted_in_active_runtime,prior_uploaded_file_metadata,"0x802C total = 0x8000 nominal SRAM + 0x2C extra bytes; extra-byte placement/meaning not claimed until raw bytes are re-read"
+"Pokemon - Crystal Version (USA, Europe) (Rev A).sav",USA-Europe,English,1,32812,32768,44,not_mounted_in_active_runtime,prior_uploaded_file_metadata,"ROM-specific save target; do not merge with Rev 0"
+Pokemon - Version Cristal (France).sav,France,French,0,32812,32768,44,not_mounted_in_active_runtime,prior_uploaded_file_metadata,"raw save bytes required before locking offsets/checksums"
+Pokemon - Kristall-Edition (Germany).sav,Germany,German,0,32812,32768,44,not_mounted_in_active_runtime,prior_uploaded_file_metadata,"raw save bytes required before locking offsets/checksums"
+Pokemon - Versione Cristallo (Italy).sav,Italy,Italian,0,32812,32768,44,not_mounted_in_active_runtime,prior_uploaded_file_metadata,"raw save bytes required before locking offsets/checksums"
+Pokemon - Edicion Cristal (Spain).sav,Spain,Spanish,0,32812,32768,44,not_mounted_in_active_runtime,prior_uploaded_file_metadata,"raw save bytes required before locking offsets/checksums"
