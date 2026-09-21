@@ -1,20 +1,87 @@
 # CRYSTAL Save Format V2 contract
 
-Status: design contract for implementation.
+Status: **evidence-driven design; raw save byte mapping still open**
 
-## Goals
+## 1. Evidence boundary
 
-- Decode every extensible identity to a 16-bit master ID.
-- Keep future additions appendable.
-- Avoid making Crystal's original Pokémon/save byte layouts the permanent modern schema.
-- Permit compact SRAM encoding without leaking compact IDs into gameplay logic.
-- Preserve explicit import paths for Japanese and localized Crystal saves.
-- Keep RTC state separate from Pokémon/content identity.
-- Detect incompatible or corrupted extension blocks.
+The save architecture is not inferred from ROM header size alone.
 
-## Header
+Observed uploaded save-file lengths:
 
-A Save V2 implementation must carry at least:
+- Japanese Crystal: 65,580 bytes (`0x1002C`).
+- International Crystal: 32,812 bytes (`0x802C`).
+
+The corresponding ROM headers declare:
+
+- Japan: 65,536 bytes SRAM.
+- International: 32,768 bytes SRAM.
+
+Both observed save containers therefore contain 44 bytes beyond nominal SRAM capacity.
+Those 44 bytes remain **opaque** until the raw `.sav` files are read again. This
+document does not assume whether they are a prefix, suffix, RTC block, emulator metadata,
+or another container structure.
+
+## 2. Legacy save profiles
+
+At minimum:
+
+- `CRYSTAL_JP_64K_SRAM`
+- `CRYSTAL_INTL_32K_SRAM`
+
+ROM revisions remain separately identified under those profiles. EN Rev A is not
+silently merged into EN Rev 0.
+
+Japanese and international layouts must have separate parsers. The source reference
+also defines `MONS_PER_BOX_JP = 30` while the international format uses 20 Pokémon per
+box, further proving that one fixed parser is insufficient.
+
+## 3. Original Pokémon record pressure
+
+Legacy BoxMon is 32 bytes and stores:
+
+```text
+species        u8
+item           u8
+moves[4]       u8 each
+ot_id          u16
+exp            u24
+stat_exp[5]    u16 each
+dvs            u16
+pp[4]          u8 each
+happiness      u8
+pokerus        u8
+caught_data    u16
+level          u8
+```
+
+Species + Item + Moves alone consume six one-byte identity fields.
+
+Naively widening those six fields to u16 increases every BoxMon by six bytes. Across
+280 international box slots that is +1,680 bytes before any modern fields are added.
+
+Save V2 therefore does not replace each legacy byte field in place.
+
+## 4. Canonical Pokémon identity
+
+Decoded runtime records expose at least:
+
+```text
+species_id      u16
+variety_id      u16
+form_id         u16
+held_item_id    u16
+move_id[4]      u16 each
+ability_id      u16
+```
+
+Additional verified generation-specific data is attached through versioned canonical
+fields/blocks.
+
+## 5. Serialized Save V2
+
+Save V2 is a versioned logical format with a physical storage backend.
+
+Minimum logical header:
 
 ```text
 magic
@@ -27,79 +94,55 @@ directory_count
 payload_checksum
 ```
 
-Exact byte offsets are assigned only after each verified Crystal save layout has been
-measured.
+Extension directory entries contain a block type/version, storage location, length,
+checksum, and flags.
 
-## Extension directory
+Unknown optional blocks are skipped by length. Unknown required blocks make the save
+incompatible rather than silently dropping data.
 
-Each extension block is described by:
+## 6. Compact dictionary encoding
 
-```text
-block_type      u16
-block_version   u16
-offset          u16/u24 build-dependent
-length          u16/u24 build-dependent
-checksum        u16
-flags           u16
-```
-
-Unknown optional blocks are skipped by length.
-Unknown required blocks make the save incompatible rather than being silently ignored.
-
-## Pokémon identity
-
-The canonical record exposes:
-
-```text
-species_id      u16
-variety_id      u16
-form_id         u16
-held_item_id    u16
-move_id[4]      u16 each
-ability_id      u16
-```
-
-Later verified mechanics and metadata are added as canonical fields or versioned blocks
-without reusing legacy sentinel values.
-
-## Compact SRAM encoding
-
-Serialized records may replace repeated 16-bit IDs with local dictionary indices.
+Save-local dictionaries may encode frequently repeated 16-bit master IDs with smaller
+indices.
 
 Rules:
 
-1. dictionary entries map to 16-bit master IDs;
-2. index 0 is NONE unless a block explicitly defines otherwise;
-3. dictionaries are save-local and never become global engine IDs;
-4. loading always resolves to canonical master IDs;
-5. dictionary overflow upgrades to a wider block version rather than renumbering IDs.
+1. dictionary entries always resolve to canonical u16 IDs;
+2. local indices never become global IDs;
+3. loading resolves all identities before gameplay logic uses them;
+4. overflow upgrades the block encoding rather than renumbering canonical IDs;
+5. the serializer chooses encoding from measured physical storage capacity.
 
-## Legacy Crystal profiles
+## 7. Physical storage backends
 
-Legacy import is profile-driven, not one-layout-fits-all.
+Save V2 is not synonymous with 32 KiB or 64 KiB SRAM.
 
-Initial verified ROM-header profiles:
+Backends currently include:
 
-- `CRYSTAL_JP_64K_SRAM`
-- `CRYSTAL_INTL_32K_SRAM`
+- retail international MBC3 SRAM compatibility;
+- retail Japanese MBC30 SRAM compatibility;
+- future expanded storage backend selected after the content/asset census.
 
-The exact Japanese/international save block maps, checksums, mirrored regions, and RTC
-interaction are measured from verified binaries/saves before implementation offsets are
-locked.
+The full Generation 10 target must not pretend the international 32 KiB retail SRAM is
+an unlimited modern save store.
 
-Legacy byte-sized Species/Move/Item values are translated through explicit compatibility
-tables. EGG and other sentinels become state flags, not fake master IDs.
+## 8. RTC
 
-## RTC
+RTC is a separate subsystem from content identity.
 
-MBC3 RTC behavior is modeled as a separate subsystem.
+Legacy RTC/container bytes are preserved until decoded. A future backend may expose RTC
+or an equivalent time service, but Species/Item/Move/Form IDs never depend on RTC
+storage layout.
 
-A Save V2 implementation may serialize RTC-related transport/continuity metadata in a
-versioned extension block when required by the target environment, but gameplay content
-IDs never depend on RTC storage layout.
+## 9. Required next evidence
 
-## Compatibility
+Before exact offsets are committed:
 
-Save V2 may differ physically from original Crystal SRAM. Compatibility is provided by
-explicit import/export code, not by freezing the modern engine to the original field
-widths.
+1. raw bytes and hashes of all seven Crystal `.sav` files;
+2. comparison of each save against its exact ROM/revision;
+3. identification of nominal SRAM payload versus the 44 extra bytes;
+4. primary/backup save blocks and checksums;
+5. Japanese 64 KiB/mobile-era regions;
+6. RTC serialization behavior of the producing emulator/tool.
+
+Until those are measured, offsets remain deliberately unlocked.
