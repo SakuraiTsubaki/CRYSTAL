@@ -1,0 +1,27 @@
+name: Validate Generation 10 capacity contract
+
+on:
+  push:
+    paths:
+      - "config/engine_capacity.json"
+      - "engine/include/**"
+      - "docs/GEN10_EXPANSION_ARCHITECTURE.md"
+      - "docs/SAVE_FORMAT_V2.md"
+      - "tools/validate_capacity.py"
+      - ".github/workflows/capacity-contract.yml"
+  pull_request:
+    paths:
+      - "config/engine_capacity.json"
+      - "engine/include/**"
+      - "docs/GEN10_EXPANSION_ARCHITECTURE.md"
+      - "docs/SAVE_FORMAT_V2.md"
+      - "tools/validate_capacity.py"
+      - ".github/workflows/capacity-contract.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate capacity contract
+        run: python3 tools/validate_capacity.py
