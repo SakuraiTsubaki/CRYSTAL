@@ -4,17 +4,25 @@ on:
   push:
     paths:
       - "config/engine_capacity.json"
+      - "config/storage_profiles.json"
       - "engine/include/**"
+      - "research/evidence/**"
       - "docs/GEN10_EXPANSION_ARCHITECTURE.md"
+      - "docs/EVIDENCE_DRIVEN_EXPANSION.md"
       - "docs/SAVE_FORMAT_V2.md"
+      - "tools/analyze_crystal_inputs.py"
       - "tools/validate_capacity.py"
       - ".github/workflows/capacity-contract.yml"
   pull_request:
     paths:
       - "config/engine_capacity.json"
+      - "config/storage_profiles.json"
       - "engine/include/**"
+      - "research/evidence/**"
       - "docs/GEN10_EXPANSION_ARCHITECTURE.md"
+      - "docs/EVIDENCE_DRIVEN_EXPANSION.md"
       - "docs/SAVE_FORMAT_V2.md"
+      - "tools/analyze_crystal_inputs.py"
       - "tools/validate_capacity.py"
       - ".github/workflows/capacity-contract.yml"
 
@@ -23,5 +31,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate capacity contract
+      - name: Validate evidence-driven capacity contract
         run: python3 tools/validate_capacity.py
