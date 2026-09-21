@@ -1,0 +1,7 @@
+source,commit,path,role,status
+pret/pokecrystal,7a7881d0d62e0ddbd82dcf10e7116807487ac651,macros/ram.asm,"BoxMon/party/box structure definitions",supplementary_source_reference
+pret/pokecrystal,7a7881d0d62e0ddbd82dcf10e7116807487ac651,constants/pokemon_data_constants.asm,"BoxMon length; 20 international mons/box; MONS_PER_BOX_JP=30",supplementary_source_reference
+pret/pokecrystal,7a7881d0d62e0ddbd82dcf10e7116807487ac651,ram/sram.asm,"international SRAM layout plus documented Japanese/mobile labels",supplementary_source_reference
+pret/pokecrystal,7a7881d0d62e0ddbd82dcf10e7116807487ac651,engine/menus/save.asm,"save/checksum/box copy routines",supplementary_source_reference
+pret/pokecrystal,7a7881d0d62e0ddbd82dcf10e7116807487ac651,constants/ram_constants.asm,"international NUM_SRAM_BANKS=4",supplementary_source_reference
+mgba-emu/gbdoc,9564b2b2c16633044ce857d739b954d94f292a7f,index.md,"MBC3 2 MiB/32 KiB and MBC30 4 MiB/64 KiB capability; JP Crystal MBC30",hardware_reference
