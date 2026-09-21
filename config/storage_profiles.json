@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "evidence_basis": {
+    "rom_manifest": "research/evidence/rom_baselines.csv",
+    "save_manifest": "research/evidence/save_baselines.csv",
+    "revision_manifest": "research/evidence/revision_diffs.csv",
+    "raw_save_bytes_currently_available": false,
+    "rule": "do_not_lock_save_offsets_or_extra-byte semantics until raw save bytes are inspected"
+  },
+  "retail_profiles": {
+    "CRYSTAL_JP": {
+      "game_code": "BXTJ",
+      "observed_rom_bytes": 2097152,
+      "header_cart_type": "0x10",
+      "header_rom_size_code": "0x06",
+      "header_ram_size_code": "0x05",
+      "header_sram_bytes": 65536,
+      "mapper_profile": "MBC30",
+      "rtc": true,
+      "documented_mapper_ceiling": {
+        "rom_bytes": 4194304,
+        "sram_bytes": 65536
+      },
+      "observed_save_container_bytes": 65580,
+      "observed_save_extra_bytes": 44
+    },
+    "CRYSTAL_INTL": {
+      "game_codes": ["BYTE", "BYTF", "BYTD", "BYTI", "BYTS"],
+      "observed_rom_bytes": 2097152,
+      "header_cart_type": "0x10",
+      "header_rom_size_code": "0x06",
+      "header_ram_size_code": "0x03",
+      "header_sram_bytes": 32768,
+      "mapper_profile": "MBC3",
+      "rtc": true,
+      "documented_mapper_ceiling": {
+        "rom_bytes": 2097152,
+        "sram_bytes": 32768
+      },
+      "observed_save_container_bytes": 32812,
+      "observed_save_extra_bytes": 44
+    }
+  },
+  "expanded_runtime": {
+    "logical_rom_bank_id_bits": 16,
+    "logical_resource_id_bits": 16,
+    "physical_mapper_is_backend": true,
+    "retail_mapper_limits_are_not_runtime_identity_limits": true,
+    "zero_filled_rom_bank_is_not_free_space_without_reference_proof": true,
+    "save_storage_is_backend": true,
+    "requires_more_than_mbc3_rom_capacity_for_unbounded_later-generation_growth": true,
+    "required_rtc_or_equivalent_time_service": true,
+    "physical_expanded_mapper": "TBD_AFTER_DATA_AND_ASSET_CENSUS"
+  }
+}
