@@ -1,97 +1,28 @@
 # CRYSTAL
 
-Evidence-driven modernization workspace for Pokémon Crystal.
+**ポケットモンスター クリスタル** (Generation II)를 **Game Boy Advance / Generation III 계열 기반의 현대화 리메이크**로 재구축하는 저장소입니다.
 
-## Current phase
+## 현재 정본 방향
 
-**Phase 0 — measure the real Crystal ROM/save family, then expand for Generation 10+**
+- 일본판 원작과 모든 확인된 revision을 원전으로 전수조사합니다.
+- 원작의 지역, 스토리, 이벤트, NPC, 버전 고유 요소는 보존합니다.
+- 포켓몬/타입/특성/기술/진화/폼/아이템/전투·육성 규칙은 현재 검증 가능한 최신 공식 기준으로 현대화합니다.
+- 최종 실행 대상은 **GBA**입니다.
+- GB/GBC mapper, SRAM, 원본 주소 구조는 원본 분석 자료로 보존하지만 최종 런타임 엔진으로 사용하지 않습니다.
+- 미출시·미검증 세대 콘텐츠는 추측하지 않습니다.
 
-The expansion contract is not allowed to outrun the evidence.
+## 기반
 
-### Verified ROM inputs
+- 원본 조사: `SakuraiTsubaki/PocketMonsters-Crystal-Disassembly`
+- 공통 현대화 연구: `SakuraiTsubaki/EMERALD`
+- 현대 코어 기준: `rh-hideout/pokeemerald-expansion@75b806a3ab57a81ff1eb6179288981f0b3cc3050`
 
-Seven retail ROMs have been read byte-for-byte and recorded by SHA-1/SHA-256:
+## 문서
 
-- Japanese `BXTJ` Rev 0
-- English `BYTE` Rev 0
-- English `BYTE` Rev A
-- French `BYTF`
-- German `BYTD`
-- Italian `BYTI`
-- Spanish `BYTS`
+- `PROJECT.md` — 현재 프로젝트 방향의 정본
+- `config/remake.json` — 기계 판독 가능한 작품/엔진/원본 기준
+- `docs/REMAKE_POLICY.md` — 원작 보존과 최신화 정책
 
-All are 2 MiB and pass header/global checksums.
+저장소에 남아 있는 이전 확장 설계 문서와 도구는 삭제하지 않습니다. 원본 구조·세이브·ID·용량 연구 자료로 보존하며, GBA 리메이크에 필요한 내용만 새 런타임 설계로 옮깁니다.
 
-The Japanese ROM declares 64 KiB SRAM and follows the MBC30-compatible hardware path.
-The six international ROMs declare 32 KiB SRAM and use the retail MBC3 capacity profile.
-
-See `research/evidence/rom_baselines.csv`.
-
-### Save inputs
-
-Seven matching Crystal save files were previously observed:
-
-- Japanese: 65,580 bytes (`0x1002C`)
-- six international/revision saves: 32,812 bytes (`0x802C`)
-
-Those sizes equal nominal SRAM plus 44 bytes in both families. The raw `.sav` bytes are
-not mounted in the current runtime, so the 44 bytes remain opaque and exact save offsets
-are deliberately not locked yet.
-
-See `research/evidence/save_baselines.csv`.
-
-## What the evidence changes
-
-- JP and international Crystal require separate legacy save profiles.
-- EN Rev 0 and Rev A remain separate baselines: 584 bytes differ across 8 ROM banks.
-- Japan has many zero-filled ROM banks, while international builds do not; fixed
-  "free-bank" expansion is therefore not portable across regions.
-- Retail MBC3's 2 MiB ROM limit cannot be the logical Generation 10 engine limit.
-- MBC30 gives the Japanese path more physical headroom, but mapper capacity remains a
-  backend detail rather than an ID/resource identity limit.
-- Original BoxMon is 32 bytes with byte-sized Species, Item, and Move IDs. Save V2 uses
-  canonical 16-bit IDs plus compact/versioned serialization instead of blindly widening
-  the legacy record in place.
-
-## Expansion contract
-
-- 16-bit append-only master IDs for Species, Variety, Form, Move, Item, Ability, Type,
-  Evolution Method, Resource, and Feature.
-- Species / Variety / Form are separate identity layers.
-- 16-bit logical Resource and ROM-bank IDs.
-- Physical mapper and save storage are backends.
-- `CRYSTAL_SAVE_V2` is versioned and has explicit JP/international legacy importers.
-- Zero-filled ROM data is only a padding candidate until proven safe from source/binary
-  references.
-- No Generation 10 names/counts/mechanics are invented before verified data exists.
-
-## Evidence and implementation files
-
-- `research/evidence/rom_baselines.csv`
-- `research/evidence/save_baselines.csv`
-- `research/evidence/revision_diffs.csv`
-- `research/evidence/reference_sources.csv`
-- `config/storage_profiles.json`
-- `config/engine_capacity.json`
-- `docs/EVIDENCE_DRIVEN_EXPANSION.md`
-- `docs/GEN10_EXPANSION_ARCHITECTURE.md`
-- `docs/SAVE_FORMAT_V2.md`
-- `engine/include/extended_ids.inc`
-- `engine/include/resource_directory.inc`
-- `tools/analyze_crystal_inputs.py`
-- `tools/validate_capacity.py`
-
-GitHub Actions validates that the capacity contract still agrees with the recorded ROM
-and save evidence.
-
-## Next work
-
-1. re-read and hash the seven raw Crystal saves;
-2. map JP vs international SRAM/checksum/RTC/container layouts byte-for-byte;
-3. import the Crystal source baseline into this repository with ROM-byte verification;
-4. replace byte-sized cross-subsystem identity accessors with canonical 16-bit accessors;
-5. implement Save V2 and mapper-independent placement;
-6. census later-generation data/assets before selecting the final expanded physical
-   mapper/storage backend.
-
-Original ROM binaries are never committed.
+ROM 바이너리는 GitHub에 커밋하지 않습니다.
