@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "project": "CRYSTAL",
   "target_generation": 10,
   "policy": {
@@ -7,7 +7,19 @@
     "guess_unreleased_content": false,
     "zero_is_none": true,
     "legacy_layout_is_not_runtime_contract": true,
-    "japanese_release_is_origin_baseline": true
+    "japanese_release_is_origin_baseline": true,
+    "evidence_before_offsets": true,
+    "region_revision_specific_legacy_profiles": true,
+    "zero_filled_rom_is_not_free_by_default": true
+  },
+  "evidence": {
+    "rom_manifest": "research/evidence/rom_baselines.csv",
+    "save_manifest": "research/evidence/save_baselines.csv",
+    "revision_manifest": "research/evidence/revision_diffs.csv",
+    "storage_profiles": "config/storage_profiles.json",
+    "verified_rom_count": 7,
+    "observed_save_metadata_count": 7,
+    "raw_save_bytes_currently_required_before_offset_lock": true
   },
   "master_id": {
     "bits": 16,
@@ -28,9 +40,20 @@
   },
   "resource_directory": {
     "resource_id_bits": 16,
-    "bank_field_bits": 16,
+    "logical_bank_id_bits": 16,
     "address_field_bits": 16,
-    "mapper_agnostic": true
+    "mapper_agnostic": true,
+    "physical_mapper_is_backend": true
+  },
+  "legacy_runtime_constraints": {
+    "boxmon_bytes": 32,
+    "species_id_bytes": 1,
+    "item_id_bytes": 1,
+    "move_id_bytes": 1,
+    "moves_per_mon": 4,
+    "international_boxes": 14,
+    "international_mons_per_box": 20,
+    "japanese_mons_per_box_reference": 30
   },
   "save": {
     "format": "CRYSTAL_SAVE_V2",
@@ -41,7 +64,10 @@
     "legacy_profiles": [
       "CRYSTAL_JP_64K_SRAM",
       "CRYSTAL_INTL_32K_SRAM"
-    ]
+    ],
+    "observed_common_extra_container_bytes": 44,
+    "extra_container_bytes_semantics": "opaque_until_raw_save_reinspection",
+    "physical_storage_is_backend": true
   },
   "rtc": {
     "subsystem_is_separate_from_identity_schema": true,
