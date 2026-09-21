@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "project": "CRYSTAL",
+  "target_generation": 10,
+  "policy": {
+    "append_only_ids": true,
+    "guess_unreleased_content": false,
+    "zero_is_none": true,
+    "legacy_layout_is_not_runtime_contract": true,
+    "japanese_release_is_origin_baseline": true
+  },
+  "master_id": {
+    "bits": 16,
+    "min_normal": 1,
+    "max_normal": 65535
+  },
+  "registries": {
+    "species": { "bits": 16, "append_only": true },
+    "variety": { "bits": 16, "append_only": true },
+    "form": { "bits": 16, "append_only": true },
+    "move": { "bits": 16, "append_only": true },
+    "item": { "bits": 16, "append_only": true },
+    "ability": { "bits": 16, "append_only": true },
+    "type": { "bits": 16, "append_only": true },
+    "evolution_method": { "bits": 16, "append_only": true },
+    "resource": { "bits": 16, "append_only": true },
+    "feature": { "bits": 16, "append_only": true }
+  },
+  "resource_directory": {
+    "resource_id_bits": 16,
+    "bank_field_bits": 16,
+    "address_field_bits": 16,
+    "mapper_agnostic": true
+  },
+  "save": {
+    "format": "CRYSTAL_SAVE_V2",
+    "versioned_blocks": true,
+    "runtime_ids_are_master_ids": true,
+    "compact_dictionary_encoding_allowed": true,
+    "legacy_import_required": true,
+    "legacy_profiles": [
+      "CRYSTAL_JP_64K_SRAM",
+      "CRYSTAL_INTL_32K_SRAM"
+    ]
+  },
+  "rtc": {
+    "subsystem_is_separate_from_identity_schema": true,
+    "legacy_import_required": true,
+    "versioned_extension_allowed": true
+  }
+}
