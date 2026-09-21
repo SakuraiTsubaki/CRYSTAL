@@ -34,5 +34,27 @@
       "gen2": 5,
       "gen3": 6
     }
-  }
+  },
+  "sharedResearch": {
+    "scriptSemantics": {
+      "repository": "SakuraiTsubaki/EMERALD",
+      "summary": "manifests/japan-script-semantic-summary.json",
+      "extraction": "manifests/japan-script-root-extraction.json",
+      "report": "research/japan-script-semantics-survey.md"
+    },
+    "battleLogic": {
+      "repository": "SakuraiTsubaki/EMERALD",
+      "matrix": "manifests/japan-battle-generation-matrix.csv",
+      "policy": "manifests/japan-battle-runtime-policy.json",
+      "report": "research/japan-battle-logic-survey.md"
+    },
+    "saveRtc": {
+      "repository": "SakuraiTsubaki/EMERALD",
+      "matrix": "manifests/japan-save-rtc-matrix.csv",
+      "policy": "manifests/remake-save-policy.json",
+      "report": "research/japan-save-rtc-survey.md"
+    }
+  },
+  "nativeSaveProfile": "JPN-CRYSTAL-GBA",
+  "nativeSaveIsolation": true
 }
