@@ -1,169 +1,164 @@
 # Generation 10-ready expansion architecture
 
-Status: **ACTIVE — Phase 0**
+Status: **ACTIVE — evidence-driven Phase 0**
 
-This document defines CRYSTAL's expansion contract before source/content import.
+CRYSTAL does not expand from a generic Pokémon-engine template. The capacity contract is
+derived from the verified Crystal ROM set and the observed Crystal save set first.
 
-## 1. Goal
+See `docs/EVIDENCE_DRIVEN_EXPANSION.md` and `research/evidence/`.
 
-Generation 10 readiness means **capacity and architecture readiness**, not guessing
-unreleased content.
+## 1. Verified starting point
 
-CRYSTAL must accept verified future records without renumbering older data or replacing
-the save/resource architecture again.
+Seven retail ROMs were read byte-for-byte:
 
-The Japanese Crystal release is the origin baseline. Localized releases and revisions
-are imported as separately verified compatibility profiles.
+- Japanese `BXTJ` Rev 0
+- English `BYTE` Rev 0
+- English `BYTE` Rev A
+- French `BYTF`
+- German `BYTD`
+- Italian `BYTI`
+- Spanish `BYTS`
 
-## 2. Master ID rule
+All seven are 2 MiB, cartridge type `0x10`, CGB-only, and pass both header and global
+checksum validation.
 
-Every registry that can grow across generations uses a 16-bit master ID.
+The Japanese ROM declares 64 KiB SRAM (`0x05`) while all verified international ROMs
+declare 32 KiB (`0x03`). This is a structural compatibility boundary, not a cosmetic
+region difference.
 
-| Registry | Runtime width | Reserved zero |
-| --- | ---: | --- |
-| Species | 16-bit | NONE |
-| Variety / battle profile | 16-bit | NONE |
-| Form / appearance | 16-bit | NONE |
-| Move | 16-bit | NONE |
-| Item | 16-bit | NONE |
-| Ability | 16-bit | NONE |
-| Type | 16-bit | NONE |
-| Evolution method | 16-bit | NONE |
-| Resource | 16-bit | NONE |
-| Feature / mechanic | 16-bit | NONE |
+## 2. Physical mapper evidence
 
-Valid normal ID space is `1..65535`.
+The international retail profile is MBC3:
 
-The width is an engine contract, not a promise that every ID will be populated.
+- 2 MiB documented ROM ceiling;
+- 32 KiB SRAM;
+- RTC.
 
-## 3. Append-only namespace
+Japanese Crystal uses the MBC30-compatible profile identified by its 64 KiB SRAM
+configuration:
 
-Registries are append-only.
+- current verified ROM is still 2 MiB;
+- MBC30 can address up to 4 MiB ROM;
+- 64 KiB SRAM;
+- RTC.
 
-- Existing IDs never move when later-generation data is imported.
-- Deletions become tombstones/aliases when compatibility requires them.
-- Generation boundaries are metadata, not numeric hard partitions.
-- No guessed "Generation 10 starts at X" constant is created before verified data exists.
-- Official National Pokédex numbers are preserved for Species whenever applicable.
-- EGG and other legacy sentinels are state, not Species IDs.
+Therefore the full later-generation engine cannot encode physical MBC3 bank numbers as
+content identity. A logical resource/bank layer is mandatory.
 
-## 4. Species, variety, and form are separate
+## 3. ROM-space evidence
 
-CRYSTAL uses three layers:
+Zero-filled ROM banks are not treated as automatically free.
+
+Observed complete zero-filled 16 KiB banks:
+
+- Japan: `0x60..0x7C` (29 banks).
+- English Rev 0 / Rev A: `0x75 0x76 0x79 0x7A`.
+- French/German/Italian/Spanish: only `0x7A`.
+
+The region builds therefore do not share one safe fixed set of spare banks. Expansion
+must be relocatable and mapper-backed, not hard-coded into "unused banks".
+
+## 4. Master ID rule
+
+Every registry that can grow across generations uses a 16-bit canonical master ID.
+
+| Registry | Runtime width |
+| --- | ---: |
+| Species | 16-bit |
+| Variety / battle profile | 16-bit |
+| Form / appearance | 16-bit |
+| Move | 16-bit |
+| Item | 16-bit |
+| Ability | 16-bit |
+| Type | 16-bit |
+| Evolution method | 16-bit |
+| Resource | 16-bit |
+| Feature / mechanic | 16-bit |
+
+Normal IDs are `1..65535`; `0` is NONE.
+
+This is a runtime identity contract. Serialized save or ROM tables may use a smaller
+local dictionary when that encoding is lossless.
+
+## 5. Why the original Pokémon record cannot simply be widened in place
+
+The original Crystal BoxMon is 32 bytes.
+
+Relevant legacy fields:
+
+- Species: 1 byte.
+- Item: 1 byte.
+- Moves: four 1-byte IDs.
+- International PC storage: 14 × 20 = 280 boxed Pokémon.
+- The source separately defines `MONS_PER_BOX_JP = 30`.
+
+Widening only Species + Item + four Move IDs from 8 to 16 bits adds six bytes to every
+BoxMon. Across the 280 international box slots alone this costs 1,680 bytes before
+adding Form, Variety, Ability, modern origin metadata, ribbons/marks, additional boxes,
+or future mechanics.
+
+Therefore legacy BoxMon is an import/export format, not the new canonical record.
+
+## 6. Species, Variety, and Form are separate
 
 ```text
 Species
   -> Variety / battle profile
-       -> Form / appearance
+       -> Form / appearance/state
 ```
 
-**Species** is the stable creature identity.
+Species remains the stable creature identity. Battle-relevant variants and appearance
+or transformation state do not consume Species IDs.
 
-**Variety** carries battle-relevant variation such as base stats, types, abilities,
-regional profiles, or other persistent battle data.
+## 7. Save evidence and Save V2
 
-**Form** describes selectable or derived appearance/state records and may reference a
-variety, graphics, palette, cry/resource overrides, and transition rules.
+Observed save-file lengths from the seven uploaded Crystal saves were:
 
-This prevents later form mechanics from consuming or renumbering Species IDs.
+- Japanese: `0x1002C` = 65,580 bytes.
+- International: `0x802C` = 32,812 bytes.
 
-## 5. Moves, items, abilities, and types
+Each is exactly the ROM-header SRAM capacity plus `0x2C` (44) bytes.
 
-Crystal's original byte-sized namespaces are legacy encodings, not the new master
-representation.
+The current runtime does not expose those raw save bytes, so the placement and meaning
+of the 44 bytes remain opaque. Save V2 must preserve unknown container data and must not
+lock offsets or RTC-container semantics from size alone.
 
-All APIs that cross subsystem boundaries exchange 16-bit master IDs. A subsystem may
-use a compact local dictionary internally, but must decode to the canonical master ID
-before gameplay logic consumes it.
+Canonical runtime IDs are 16-bit. Save V2 may use save-local dictionaries and versioned
+extension blocks. Legacy Japanese and international saves have separate importers.
 
-This avoids widening Species now only to require another save/runtime rewrite when
-Move, Item, Ability, Type, or future mechanics exceed legacy limits.
-
-## 6. Save architecture
-
-Runtime width and serialized storage width are separate concerns.
-
-CRYSTAL Save V2 uses:
-
-- a versioned header;
-- feature flags;
-- extension blocks;
-- per-block lengths and checksums;
-- compact dictionaries/side tables where useful;
-- explicit importers for each verified legacy save profile;
-- canonical in-memory records exposing 16-bit master IDs.
-
-Crystal requires more than one legacy profile. The Japanese ROM header declares 64 KiB
-SRAM while the currently verified international ROM headers declare 32 KiB. Physical
-offsets and block maps are therefore measured per release/revision before import/export
-code is finalized.
-
-RTC handling is a separate subsystem and may use a versioned extension/transport block;
-RTC state must never be overloaded into identity fields.
-
-See `SAVE_FORMAT_V2.md`.
-
-## 7. Resource and ROM-bank abstraction
-
-Gameplay logic must not hard-code the physical ROM bank of content.
-
-Use:
+## 8. Resource and mapper architecture
 
 ```text
 ResourceId (u16)
   -> ResourceDirectory
-       -> mapper-specific bank/address
+       -> logical bank/address
+            -> mapper backend
 ```
 
-The directory uses a 16-bit bank field even when the initial Game Boy Color mapper
-backend needs fewer bits. Mapper/ROM expansion can then replace the backend without
-rewriting every content consumer.
+The resource directory uses a 16-bit logical bank ID. Retail MBC3 and MBC30 are backend
+profiles, not engine-wide identity limits.
 
-## 8. Feature registry for future mechanics
+The final expanded physical mapper/storage backend is selected only after the complete
+data + graphics + audio + text census establishes the required capacity.
 
-Unknown future mechanics are represented through a feature registry and data-driven
-descriptors.
+## 9. Revision handling
 
-Potential consumers include:
+English Rev 0 and Rev A differ by 584 bytes across 79 ranges in eight banks. Bank
+`0x5C` contains 546 changed bytes.
 
-- battle transformations;
-- form transitions;
-- field actions;
-- encounter rules;
-- evolution methods;
-- held-item effects;
-- move behavior flags;
-- save extension blocks.
-
-Do not reserve guessed Generation 10 mechanic names, counts, or IDs.
-
-## 9. Compatibility layers
-
-CRYSTAL distinguishes:
-
-1. **Legacy source format** — original Crystal structures and byte-sized fields.
-2. **Canonical runtime format** — 16-bit IDs and extensible records.
-3. **Serialized Save V2 format** — compact, versioned representation.
-
-Importers perform legacy -> canonical conversion.
-Serializers perform canonical <-> Save V2 conversion.
-
-Gameplay code must not depend on the original byte layout.
+A revision is therefore an explicit compatibility baseline. Save and ROM evidence are
+never merged solely because titles/languages match.
 
 ## 10. Phase order
 
-Phase 0 is complete when the capacity contract, ID include, save contract, validator,
-and mapper-independent resource contract exist.
+1. preserve the seven verified ROM baselines and their hashes;
+2. re-read/hash all seven raw save files and map their layouts separately;
+3. import a source baseline while retaining ROM-byte verification;
+4. replace byte-sized cross-subsystem Species/Move/Item APIs with canonical ID accessors;
+5. introduce Variety/Form/Ability-aware canonical Pokémon records;
+6. implement legacy save importers and Save V2 serializer;
+7. implement mapper-independent resource placement;
+8. census later-generation data/assets and select the expanded physical mapper backend;
+9. append verified generations through Generation 10 without renumbering prior IDs.
 
-Next:
-
-1. verify/import the Japanese Crystal baseline;
-2. verify localized/revision compatibility profiles;
-3. establish canonical registry manifests;
-4. convert Species/Move/Item accessors to 16-bit-safe APIs;
-5. introduce generic Variety/Form access;
-6. implement Save V2 and legacy/RTC import paths;
-7. route graphics/text/audio through the resource directory;
-8. append verified later-generation datasets through Generation 10 and beyond.
-
-The key rule is: **expand the architecture first; populate it second.**
+**Measure first, expand second, populate third.**
