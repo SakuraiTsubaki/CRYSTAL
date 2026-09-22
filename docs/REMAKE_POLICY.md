@@ -1,28 +1,27 @@
-# Remake Policy
+# Native Expansion Policy
 
-## Preserve from the original
+## Preserve from Crystal
 
-- 지역과 스토리의 핵심 구조
-- NPC와 이벤트의 의미 및 진행 조건
-- Crystal 고유 요소와 원작 진행
-- 일본판 원본의 동작과 수정 이력
-- 원본 트레이너·야생·아이템·대사·맵의 출처 기록
+- Japanese original behavior as the origin baseline.
+- Every verified international revision as a separate compatibility baseline.
+- Region/story/event/NPC/version-specific behavior unless intentionally modernized.
+- ROM and save evidence, checksums, RTC behavior, mapper behavior, and revision differences.
 
-## Modernize to the latest verified official rules
+## Expand for Generation 10+
 
-- 포켓몬 종족 데이터와 타입
-- 특성
-- 기술/기술 효과와 물리·특수 분리
-- 진화 조건과 후대 진화형
-- 리전폼·리전진화·검증된 폼 시스템
-- 아이템 효과
-- 현대 전투 규칙과 육성/편의 기능
-- 최신 공식 명칭 체계
+- Canonical Species, Move, Item, Ability, Type, Form, Variety, Evolution Method,
+  Resource, and Feature identities use 16-bit append-only IDs.
+- Original one-byte identity fields remain legacy serialization formats.
+- New runtime structures must not silently truncate canonical IDs.
+- Physical mapper/SRAM limits are backend constraints and are selected from measured capacity needs.
+- Save V2 uses versioned blocks and explicit migration/import logic.
 
 ## Engine boundary
 
-최종 실행 대상은 GBA다. GBC 원본 ROM 구조, mapper, RTC, SRAM 형식은 원본 분석·가져오기 근거로만 사용한다. 리메이크 런타임은 Generation III 계열의 현대화 코어를 사용한다.
+The implementation target is the original **Game Boy Color Crystal engine**.
+GBA remake integration is explicitly out of scope here and is handled separately.
 
 ## Future-content rule
 
-공개·검증된 공식 데이터만 반영한다. 미출시 세대의 종·기술·아이템·특성·메커니즘은 이름이나 수량을 추측해서 넣지 않는다.
+Only verified official data is added. Generation 10 capacity is reserved structurally;
+unreleased species, moves, items, abilities, mechanics, names, or counts are not invented.
