@@ -91,5 +91,27 @@
     "unitValidator": "SakuraiTsubaki/EMERALD:tools/validate_johto_gba_map_units.py",
     "firstSliceReport": "SakuraiTsubaki/EMERALD:research/johto-gba-first-slice.md",
     "sourceVisualPolicy": "GSC Johto graphics/metatiles are visual truth; Emerald supplies GBA map/metatile/behavior implementation"
+  },
+  "gen10Capacity": {
+    "target": "Generation 10+",
+    "contract": "config/gba_gen10_capacity.json",
+    "canonicalIdBits": {
+      "species": 16,
+      "item": 16,
+      "move": 16
+    },
+    "boxPokemonExtension": "engine/gba/include/crystal_gen10_ids.h",
+    "upstreamAudit": "tools/audit_gba_capacity.py",
+    "upstreamPatch": "tools/apply_crystal_gen10_patch.py",
+    "saveStrategy": {
+      "boxPokemonBytes": 84,
+      "pokemonStorageSectors": 10,
+      "sectorsPerSlot": 15,
+      "duplicateSlots": 2,
+      "hallOfFameSectors": 2,
+      "standaloneTrainerHillSector": false,
+      "standaloneRecordedBattleSector": false
+    },
+    "status": "phase-1-build-validation"
   }
 }
