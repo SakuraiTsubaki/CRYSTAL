@@ -515,6 +515,43 @@ static ALWAYS_INLINE void CrystalSetMoveId(struct BoxPokemon *boxMon, u16 *unuse
 """,
     )
 
+    recorded_c = root / "src/recorded_battle.c"
+
+    replace_once(
+        recorded_c,
+        """// Save data using TryWriteSpecialSaveSector is allowed to exceed SECTOR_DATA_SIZE (up to the counter field)
+STATIC_ASSERT(sizeof(struct RecordedBattleSave) <= SECTOR_COUNTER_OFFSET, RecordedBattleSaveFreeSpace);
+""",
+        """// CRYSTAL native saves use sectors 30-31 for Hall of Fame after the
+// 15-sector dual-save expansion. Standalone Recorded Battle persistence is
+// intentionally disabled instead of allowing an oversized write.
+""",
+    )
+
+    replace_once(
+        recorded_c,
+        """static bool32 RecordedBattleToSave(struct RecordedBattleSave *battleSave, struct RecordedBattleSave *saveSector)
+{
+    memset(saveSector, 0, SECTOR_SIZE);
+    memcpy(saveSector, battleSave, sizeof(*battleSave));
+
+    saveSector->checksum = CalcByteArraySum((void *)(saveSector), sizeof(*saveSector) - 4);
+
+    if (TryWriteSpecialSaveSector(SECTOR_ID_RECORDED_BATTLE, (void *)(saveSector)) != SAVE_STATUS_OK)
+        return FALSE;
+    else
+        return TRUE;
+}
+""",
+        """static bool32 RecordedBattleToSave(struct RecordedBattleSave *battleSave, struct RecordedBattleSave *saveSector)
+{
+    (void)battleSave;
+    (void)saveSector;
+    return FALSE;
+}
+""",
+    )
+
     subprocess.run(["git", "-C", str(root), "diff", "--check"], check=True)
     print("CRYSTAL Gen10 engine patch: applied cleanly")
     return 0
