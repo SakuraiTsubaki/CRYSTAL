@@ -552,6 +552,37 @@ STATIC_ASSERT(sizeof(struct RecordedBattleSave) <= SECTOR_COUNTER_OFFSET, Record
 """,
     )
 
+    test_pokemon_c = root / "test/pokemon.c"
+    test_anchor = """TEST("Nature independent from Hidden Nature")
+"""
+    test_code = """TEST("CRYSTAL Gen10 Species Item and Move IDs round-trip above legacy bit limits")
+{
+    struct BoxPokemon boxMon;
+    u16 species = 50000;
+    u16 item = 60000;
+    u16 moves[MAX_MON_MOVES] = {30000, 40000, 50000, 65535};
+
+    ZeroBoxMonData(&boxMon);
+
+    SetBoxMonData(&boxMon, MON_DATA_SPECIES, &species);
+    SetBoxMonData(&boxMon, MON_DATA_HELD_ITEM, &item);
+    SetBoxMonData(&boxMon, MON_DATA_MOVE1, &moves[0]);
+    SetBoxMonData(&boxMon, MON_DATA_MOVE2, &moves[1]);
+    SetBoxMonData(&boxMon, MON_DATA_MOVE3, &moves[2]);
+    SetBoxMonData(&boxMon, MON_DATA_MOVE4, &moves[3]);
+
+    EXPECT_EQ(GetBoxMonData(&boxMon, MON_DATA_SPECIES), species);
+    EXPECT_EQ(GetBoxMonData(&boxMon, MON_DATA_HELD_ITEM), item);
+    EXPECT_EQ(GetBoxMonData(&boxMon, MON_DATA_MOVE1), moves[0]);
+    EXPECT_EQ(GetBoxMonData(&boxMon, MON_DATA_MOVE2), moves[1]);
+    EXPECT_EQ(GetBoxMonData(&boxMon, MON_DATA_MOVE3), moves[2]);
+    EXPECT_EQ(GetBoxMonData(&boxMon, MON_DATA_MOVE4), moves[3]);
+}
+
+TEST("Nature independent from Hidden Nature")
+"""
+    replace_once(test_pokemon_c, test_anchor, test_code)
+
     subprocess.run(["git", "-C", str(root), "diff", "--check"], check=True)
     print("CRYSTAL Gen10 engine patch: applied cleanly")
     return 0
