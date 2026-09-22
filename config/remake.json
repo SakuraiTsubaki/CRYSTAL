@@ -86,6 +86,10 @@
       "NEW_BARK_TOWN",
       "ROUTE_29",
       "CHERRYGROVE_CITY"
-    ]
+    ],
+    "firstSliceManifest": "SakuraiTsubaki/EMERALD:manifests/johto-gba-first-slice.json",
+    "unitValidator": "SakuraiTsubaki/EMERALD:tools/validate_johto_gba_map_units.py",
+    "firstSliceReport": "SakuraiTsubaki/EMERALD:research/johto-gba-first-slice.md",
+    "sourceVisualPolicy": "GSC Johto graphics/metatiles are visual truth; Emerald supplies GBA map/metatile/behavior implementation"
   }
 }
