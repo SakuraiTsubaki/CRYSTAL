@@ -53,6 +53,13 @@
       "matrix": "manifests/japan-save-rtc-matrix.csv",
       "policy": "manifests/remake-save-policy.json",
       "report": "research/japan-save-rtc-survey.md"
+    },
+    "johtoMapDonors": {
+      "repository": "SakuraiTsubaki/EMERALD",
+      "donorCatalog": "manifests/hoenn-to-johto-map-donors.csv",
+      "mapPlan": "manifests/johto-gba-map-plan.csv",
+      "report": "research/hoenn-map-donor-survey.md",
+      "emeraldRef": "5eff78649e7170a877b961ef0b3da13b81a16038"
     }
   },
   "nativeSaveProfile": "JPN-CRYSTAL-GBA",
@@ -67,6 +74,18 @@
     "runtimeModes": [
       "generation-superset",
       "source-version-reproduction"
+    ]
+  },
+  "mapConversion": {
+    "sourceTruth": "Japanese Crystal map topology/events",
+    "johtoGbaDonor": "Ruby/Sapphire/Emerald, Emerald preferred",
+    "kantoGbaDonor": "FireRed/LeafGreen",
+    "hgssRole": "official later interpretation reference; not runtime base",
+    "geometryPolicy": "preserve source identity; donor layouts are grammar/reference, not coordinate replacements",
+    "firstVerticalSlice": [
+      "NEW_BARK_TOWN",
+      "ROUTE_29",
+      "CHERRYGROVE_CITY"
     ]
   }
 }
