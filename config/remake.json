@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "project": "CRYSTAL",
   "title": "ポケットモンスター クリスタル",
   "originalGeneration": 2,
@@ -56,5 +56,17 @@
     }
   },
   "nativeSaveProfile": "JPN-CRYSTAL-GBA",
-  "nativeSaveIsolation": true
+  "nativeSaveIsolation": true,
+  "generationSuperset": {
+    "repository": "SakuraiTsubaki/EMERALD",
+    "manifest": "manifests/generation-supersets.json",
+    "documentation": "docs/GENERATION_SUPERSET_MERGE.md",
+    "generationKey": "gen2",
+    "sourceProfile": "CRYSTAL",
+    "mergePolicy": "union-preserve-variants",
+    "runtimeModes": [
+      "generation-superset",
+      "source-version-reproduction"
+    ]
+  }
 }
