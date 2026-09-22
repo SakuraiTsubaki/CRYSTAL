@@ -2,25 +2,38 @@
 
 ## Canonical direction
 
-ポケットモンスター クリスタル를 **Game Boy Advance / Generation III 계열 기반의 현대화 리메이크**로 재구축한다.
+ポケットモンスター クリスタル의 **원본 Game Boy Color 엔진을 직접 확장**하여
+Generation 10 이후까지 수용할 수 있는 구조를 만든다.
 
-이 문서는 현재 프로젝트 방향의 정본이다. 저장소에 남아 있는 과거 GB/GBC 확장·mapper·legacy-save 설계는 원본 분석 자료로 보존하되, 최종 실행 엔진 기준으로 사용하지 않는다.
+GBA 리메이크는 별도 작업이며 이 저장소의 native runtime 기준이 아니다.
 
-## Original baseline
+## Source baselines
 
-- `Pocket Monsters - Crystal Version (Japan).gbc`
-
-원본 조사 저장소: `SakuraiTsubaki/PocketMonsters-Crystal-Disassembly`
-
-일본판 Crystal 고유 요소를 독립적으로 조사하고 보존한다.
+- Japanese `BXTJ` Rev 0 is the origin/master reference.
+- English `BYTE` Rev 0 and Rev A are separate revision baselines.
+- French `BYTF`, German `BYTD`, Italian `BYTI`, Spanish `BYTS` are independent localized baselines.
+- ROM and save evidence must remain revision-specific.
 
 ## Runtime baseline
 
-- Host: Game Boy Advance
-- Engine family: Generation III-derived
-- Modern core reference: `rh-hideout/pokeemerald-expansion@75b806a3ab57a81ff1eb6179288981f0b3cc3050`
-- Coordination/reference workspace: `SakuraiTsubaki/EMERALD`
+- Host: Game Boy Color
+- CPU: Sharp SM83
+- Native engine family: Pokémon Crystal / Generation II
+- Retail compatibility backends:
+  - Japan: MBC30-compatible / 64 KiB SRAM / RTC
+  - International: MBC3 / 32 KiB SRAM / RTC
+- Expanded mapper/storage backend: selected only after complete code/data/graphics/audio/text capacity census.
 
-## Remake rule
+## Generation 10-ready rules
 
-원작의 지역·스토리·이벤트·NPC·버전 고유성은 보존한다. 포켓몬 시스템은 현재 검증 가능한 최신 공식 기준으로 현대화한다. 미출시/미검증 세대 데이터는 추측하지 않는다.
+- Cross-subsystem IDs use append-only 16-bit canonical identities.
+- Legacy 8-bit ROM/save fields are import/export encodings, not the new runtime identity contract.
+- Mapper-independent resource lookup separates logical content IDs from physical bank placement.
+- Save V2 is versioned and keeps Japanese/international legacy import paths separate.
+- Existing ROM behavior remains evidence for compatibility; unverified future content is never guessed.
+
+## Separation from GBA work
+
+Johto GBA remake work, pokeemerald-expansion integration, Hoenn/FRLG donor assets,
+and GBA save geometry belong to the separate GBA remake workstream and are not part of
+this repository's native GBC expansion implementation.
