@@ -51,3 +51,9 @@ jobs:
       - name: Build patched Emerald engine
         working-directory: _upstream/pokeemerald-expansion
         run: make -j$(nproc) -O all
+
+      - name: Run patched engine test suite
+        working-directory: _upstream/pokeemerald-expansion
+        env:
+          TEST: 1
+        run: make -j$(nproc) check
