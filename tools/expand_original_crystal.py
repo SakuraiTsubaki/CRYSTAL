@@ -123,16 +123,26 @@ def regenerate_stadium_metadata(buf: bytearray) -> None:
 
     buf[0x14E:0x150] = b"\x00\x00"
 
-    base_prefix = bytes(buf[STADIUM_BASE_OFFSET:STADIUM_BASE_OFFSET + 6])
+    old_base = bytes(buf[STADIUM_BASE_OFFSET:STADIUM_BASE_OFFSET + STADIUM_BASE_TOTAL_BYTES])
+    base_prefix = old_base[:6]
     if base_prefix[:4] == b"base":
+        # Only bank 0 changes inside the original 128-bank Stadium domain
+        # (header + OpenSRAM guard). Preserve the retail match bitmap for
+        # banks 1..127 and clear bank 0's match bit.
+        old_flags = bytearray(old_base[8:])
+        if len(old_flags) != 16:
+            raise AssertionError("unexpected Crystal base-match bitmap length")
+        old_flags[0] &= 0xFE
+
         buf[STADIUM_BASE_OFFSET:STADIUM_BASE_OFFSET + STADIUM_BASE_TOTAL_BYTES] = bytes(STADIUM_BASE_TOTAL_BYTES)
         buf[STADIUM_BASE_OFFSET:STADIUM_BASE_OFFSET + 6] = base_prefix
+        buf[STADIUM_BASE_OFFSET + 8:STADIUM_BASE_OFFSET + 24] = old_flags
         base_crc = stadium_crc(
             STADIUM_BASE_CRC_INIT,
             buf[STADIUM_BASE_OFFSET:STADIUM_BASE_OFFSET + STADIUM_BASE_TOTAL_BYTES],
         )
         set_u16be(buf, STADIUM_BASE_OFFSET + 6, base_crc)
-    elif any(buf[STADIUM_BASE_OFFSET:STADIUM_BASE_OFFSET + STADIUM_BASE_TOTAL_BYTES]):
+    elif any(old_base):
         raise ValueError("unexpected nonzero/non-base data before N64PS3 metadata")
 
     buf[STADIUM_N64_OFFSET:STADIUM_N64_OFFSET + STADIUM_N64_TOTAL_BYTES] = bytes(STADIUM_N64_TOTAL_BYTES)
