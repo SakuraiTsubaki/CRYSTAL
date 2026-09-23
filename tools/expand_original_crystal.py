@@ -30,6 +30,20 @@ ROM_SIZE_4M = 0x07
 RAM_SIZE_32K = 0x03
 RAM_SIZE_64K = 0x05
 
+STADIUM_BASE_ROM_BYTES = 0x200000
+STADIUM_BANK_BYTES = 0x4000
+STADIUM_NUM_BANKS = 128
+STADIUM_N64_HEADER = b"N64PS3"
+STADIUM_N64_HEADER_BYTES = 8
+STADIUM_N64_DATA_BYTES = STADIUM_NUM_BANKS * 2 * 2
+STADIUM_N64_TOTAL_BYTES = STADIUM_N64_HEADER_BYTES + STADIUM_N64_DATA_BYTES
+STADIUM_N64_OFFSET = STADIUM_BASE_ROM_BYTES - STADIUM_N64_TOTAL_BYTES
+STADIUM_BASE_TOTAL_BYTES = 24
+STADIUM_BASE_OFFSET = STADIUM_N64_OFFSET - STADIUM_BASE_TOTAL_BYTES
+STADIUM_CRC_POLY = 0xC387
+STADIUM_CRC_INIT = 0xFEFE
+STADIUM_BASE_CRC_INIT = 0xACDE
+
 
 def sha1(data: bytes) -> str:
     return hashlib.sha1(data).hexdigest()
@@ -61,6 +75,81 @@ def validate_checksums(data: bytes) -> None:
 def fix_checksums(buf: bytearray) -> None:
     buf[0x14D] = header_checksum(buf)
     buf[0x14E:0x150] = global_checksum(buf).to_bytes(2, "big")
+
+
+def _stadium_crc_table() -> list[int]:
+    table = []
+    for i in range(256):
+        rem = 0
+        c = i
+        for _ in range(8):
+            rem = (rem >> 1) ^ (STADIUM_CRC_POLY if ((rem ^ c) & 1) else 0)
+            c >>= 1
+        table.append(rem & 0xFFFF)
+    return table
+
+
+STADIUM_CRC_TABLE = _stadium_crc_table()
+
+
+def stadium_crc(init: int, data: bytes | bytearray) -> int:
+    crc = init
+    for byte in data:
+        crc = (crc >> 8) ^ STADIUM_CRC_TABLE[(crc & 0xFF) ^ byte]
+    return crc & 0xFFFF
+
+
+def stadium_sum(init: int, data: bytes | bytearray) -> int:
+    return (init + sum(data)) & 0xFFFF
+
+
+def set_u16be(buf: bytearray, offset: int, value: int) -> None:
+    buf[offset:offset + 2] = value.to_bytes(2, "big")
+
+
+def regenerate_stadium_metadata(buf: bytearray) -> None:
+    """Regenerate the 2 MiB Stadium checksum area after header/code mutations.
+
+    International builds keep a conservative base block: its version header is
+    preserved, all 128 "matches base ROM" flags are cleared, and its CRC is
+    recalculated. Japanese Crystal has no base block at this location, so its
+    zero-filled 24-byte area remains zero.
+    """
+    if len(buf) < STADIUM_BASE_ROM_BYTES:
+        raise ValueError("ROM too small for Crystal Stadium metadata")
+
+    if bytes(buf[STADIUM_N64_OFFSET:STADIUM_N64_OFFSET + 6]) != STADIUM_N64_HEADER:
+        raise ValueError("missing N64PS3 signature at the expected Crystal offset")
+
+    buf[0x14E:0x150] = b"\x00\x00"
+
+    base_prefix = bytes(buf[STADIUM_BASE_OFFSET:STADIUM_BASE_OFFSET + 6])
+    if base_prefix[:4] == b"base":
+        buf[STADIUM_BASE_OFFSET:STADIUM_BASE_OFFSET + STADIUM_BASE_TOTAL_BYTES] = bytes(STADIUM_BASE_TOTAL_BYTES)
+        buf[STADIUM_BASE_OFFSET:STADIUM_BASE_OFFSET + 6] = base_prefix
+        base_crc = stadium_crc(
+            STADIUM_BASE_CRC_INIT,
+            buf[STADIUM_BASE_OFFSET:STADIUM_BASE_OFFSET + STADIUM_BASE_TOTAL_BYTES],
+        )
+        set_u16be(buf, STADIUM_BASE_OFFSET + 6, base_crc)
+    elif any(buf[STADIUM_BASE_OFFSET:STADIUM_BASE_OFFSET + STADIUM_BASE_TOTAL_BYTES]):
+        raise ValueError("unexpected nonzero/non-base data before N64PS3 metadata")
+
+    buf[STADIUM_N64_OFFSET:STADIUM_N64_OFFSET + STADIUM_N64_TOTAL_BYTES] = bytes(STADIUM_N64_TOTAL_BYTES)
+    buf[STADIUM_N64_OFFSET:STADIUM_N64_OFFSET + 6] = STADIUM_N64_HEADER
+
+    half_bank = STADIUM_BANK_BYTES // 2
+    for i in range(STADIUM_NUM_BANKS * 2):
+        source = i * half_bank
+        checksum = stadium_sum(STADIUM_CRC_INIT, buf[source:source + half_bank])
+        set_u16be(buf, STADIUM_N64_OFFSET + STADIUM_N64_HEADER_BYTES + i * 2, checksum)
+
+    data_start = STADIUM_N64_OFFSET + STADIUM_N64_HEADER_BYTES
+    n64_crc = stadium_crc(
+        STADIUM_CRC_INIT,
+        buf[data_start:STADIUM_N64_OFFSET + STADIUM_N64_TOTAL_BYTES],
+    )
+    set_u16be(buf, STADIUM_N64_OFFSET + 6, n64_crc)
 
 
 def load_config(path: Path) -> dict:
@@ -127,7 +216,9 @@ def _expand_rom_with_profile(data: bytes, release_id: str, profile: dict) -> tup
     out[0x147] = CART_MBC3_RTC_RAM_BATTERY
     out[0x148] = ROM_SIZE_4M
     out[0x149] = RAM_SIZE_64K
-    fix_checksums(out)
+    out[0x14D] = header_checksum(out)
+    regenerate_stadium_metadata(out)
+    out[0x14E:0x150] = global_checksum(out).to_bytes(2, "big")
     validate_checksums(out)
 
     report = {
@@ -140,6 +231,7 @@ def _expand_rom_with_profile(data: bytes, release_id: str, profile: dict) -> tup
         "output_bytes": len(out),
         "rom_banks_16k": len(out) // 0x4000,
         "sram_banks_8k": 8,
+        "stadium_metadata_regenerated": True,
         "header": {
             "cartridge_type": f"0x{out[0x147]:02X}",
             "rom_size_code": f"0x{out[0x148]:02X}",
