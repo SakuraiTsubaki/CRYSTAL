@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "project": "CRYSTAL",
+  "stage": "native-gbc-id-sidecar-1",
+  "source_anchor": "config/native_source_anchor.json",
+  "canonical_identity_bits": 16,
+  "legacy_boxmon_bytes": 32,
+  "policy": {
+    "preserve_legacy_boxmon_layout": true,
+    "legacy_low_bytes_remain_in_place": true,
+    "high_identity_bytes_use_sidecar": true,
+    "japanese_layout_not_inferred_from_combined_capacity": true
+  },
+  "persistent_slot_capacity": {
+    "source_max_boxes": 14,
+    "source_max_mons_per_box": 30,
+    "party_slots": 6,
+    "safety_formula": "14 * 30 + 6",
+    "slots": 426,
+    "note": "This combines independently observed source maxima to reserve capacity; it does not claim that Japanese Crystal stores 14 boxes of 30."
+  },
+  "sidecar": {
+    "sram_bank": 4,
+    "start": "0xB001",
+    "end_exclusive": "0xBF1B",
+    "available_bytes": 4095,
+    "header_bytes": 32,
+    "entry_bytes": 9,
+    "entry_bytes_total": 3834,
+    "total_bytes": 3866,
+    "remaining_bytes": 229,
+    "entry": {
+      "species_high_u8": 0,
+      "item_high_u8": 1,
+      "move1_high_u8": 2,
+      "move2_high_u8": 3,
+      "move3_high_u8": 4,
+      "move4_high_u8": 5,
+      "variant_profile_u16_le": 6,
+      "ability_state_u8": 8
+    }
+  },
+  "runtime": {
+    "code_bank": "0x80",
+    "abi": [
+      "CrystalGetSpeciesID",
+      "CrystalSetSpeciesID",
+      "CrystalGetHeldItemID",
+      "CrystalSetHeldItemID",
+      "CrystalGetMoveID",
+      "CrystalSetMoveID",
+      "CrystalGetVariantProfileID",
+      "CrystalSetVariantProfileID",
+      "CrystalGetAbilityState",
+      "CrystalSetAbilityState"
+    ]
+  },
+  "status": "implemented-storage-and-abi-not-yet-wired-to-all-consumers"
+}
