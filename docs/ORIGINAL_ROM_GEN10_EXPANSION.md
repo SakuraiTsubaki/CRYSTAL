@@ -57,10 +57,27 @@ before mutation. A mismatching ROM is refused.
 5. pads the ROM from 2 MiB to 4 MiB with `0xFF`;
 6. sets ROM-size code `0x07` and RAM-size code `0x05`;
 7. retains cartridge type `0x10` and RTC semantics;
-8. recalculates both checksums;
-9. verifies deterministic output hashes measured from the supplied ROM set.
+8. regenerates Crystal's original 2 MiB Pokémon Stadium 2 metadata (`base`/`N64PS3`), because the header and international OpenSRAM bytes changed;
+9. recalculates the Game Boy global checksum over the full 4 MiB image;
+10. verifies deterministic output hashes measured from the supplied ROM set.
 
 No ROM output is committed to GitHub.
+
+### Stadium 2 compatibility metadata
+
+Crystal stores Stadium 2 compatibility metadata at the end of the original 2 MiB domain:
+
+- `base` block: `0x1FFDE0..0x1FFDF7` on international builds;
+- `N64PS3` block: starts at `0x1FFDF8` on all seven verified ROMs.
+
+Stage 0 modifies bank 0 (header, and on international releases the OpenSRAM guard), so the
+old Stadium checksums cannot be left untouched.
+
+The transformer preserves the retail per-bank base-match bitmap for banks 1..127, clears
+bank 0's match bit, recalculates the base CRC, and regenerates all N64PS3 half-bank checksums
+over the original 128-bank compatibility domain. Japanese Crystal has no `base` header in
+the 24 bytes before `N64PS3`; that area remains zero.
+
 
 ## Save transform boundary
 
