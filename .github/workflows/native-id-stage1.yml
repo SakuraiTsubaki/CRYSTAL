@@ -1,0 +1,69 @@
+name: Build native Crystal ID Stage 1
+
+on:
+  push:
+    paths:
+      - "config/native_id_stage1.json"
+      - "tools/apply_native_id_stage1.py"
+      - "tools/verify_native_id_stage1.py"
+      - "tools/apply_native_source_stage0.py"
+      - ".github/workflows/native-id-stage1.yml"
+  pull_request:
+    paths:
+      - "config/native_id_stage1.json"
+      - "tools/apply_native_id_stage1.py"
+      - "tools/verify_native_id_stage1.py"
+      - "tools/apply_native_source_stage0.py"
+      - ".github/workflows/native-id-stage1.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout CRYSTAL
+        uses: actions/checkout@v4
+
+      - name: Checkout pinned Crystal source
+        uses: actions/checkout@v4
+        with:
+          repository: pret/pokecrystal
+          ref: e058e4f50b3bbf7377e036b81c25a72c54656c5c
+          path: _source/pokecrystal
+          fetch-depth: 1
+
+      - name: Checkout RGBDS 1.0.4
+        uses: actions/checkout@v4
+        with:
+          repository: gbdev/rgbds
+          ref: v1.0.4
+          path: _source/rgbds
+          fetch-depth: 1
+
+      - name: Install RGBDS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -yq bison libpng-dev pkg-config
+          sudo make -C _source/rgbds -j$(nproc) install
+
+      - name: Apply native Stage 0 and Stage 1
+        run: |
+          python3 tools/apply_native_source_stage0.py _source/pokecrystal
+          python3 tools/apply_native_id_stage1.py _source/pokecrystal
+          git -C _source/pokecrystal diff --check
+          git -C _source/pokecrystal diff --stat
+
+      - name: Build Rev0 and RevA with native 16-bit sidecar ABI
+        working-directory: _source/pokecrystal
+        run: make -j$(nproc) crystal crystal11
+
+      - name: Verify Rev0 Stage 1 layout
+        run: |
+          python3 tools/verify_native_id_stage1.py \
+            _source/pokecrystal/pokecrystal.gbc \
+            _source/pokecrystal/pokecrystal.sym
+
+      - name: Verify RevA Stage 1 layout
+        run: |
+          python3 tools/verify_native_id_stage1.py \
+            _source/pokecrystal/pokecrystal11.gbc \
+            _source/pokecrystal/pokecrystal11.sym
