@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "project": "CRYSTAL",
+  "stage": "native-gbc-physical-expansion-0",
+  "target": {
+    "platform": "Game Boy Color",
+    "mapper_profile": "MBC30-compatible",
+    "cartridge_type": "0x10",
+    "rom_bytes": 4194304,
+    "rom_banks_16k": 256,
+    "rom_size_code": "0x07",
+    "sram_bytes": 65536,
+    "sram_banks_8k": 8,
+    "ram_size_code": "0x05",
+    "padding_byte": "0xFF",
+    "rtc_preserved": true
+  },
+  "signatures": {
+    "bankswitch_offset": "0x0010",
+    "bankswitch_bytes": "E0 9D EA 00 20 C9",
+    "open_sram_enable_select_write_bytes": "F5 3E 01 EA 00 60 3E 0A EA 00 00 F1 EA 00 40 C9",
+    "international_open_sram_guard_bytes": "FE 04 38 02 18 10",
+    "international_open_sram_guard_patch": "04 -> 08"
+  },
+  "save_policy": {
+    "raw_international_sram_input_bytes": 32768,
+    "raw_japanese_sram_input_bytes": 65536,
+    "expanded_sram_output_bytes": 65536,
+    "new_sram_banks_fill_byte": "0x00",
+    "container_sizes_observed": [32812, 65580],
+    "container_extra_bytes_observed": 44,
+    "container_transform_enabled": false,
+    "reason": "the 44 extra bytes have not been re-read byte-for-byte in the current evidence set, so their placement/semantics are not assumed"
+  },
+  "releases": {
+    "japan_rev0": {
+      "filename": "Pocket Monsters - Crystal Version (Japan).gbc",
+      "game_code": "BXTJ",
+      "revision": 0,
+      "input_sha1": "95127b901bbce2407daf43cce9f45d4c27ef635d",
+      "input_sha256": "136ada06cb68656b7de475fa4b278d37dbeff8f5257e7dfdf7f4a4aec19a90f3",
+      "input_rom_size_code": "0x06",
+      "input_ram_size_code": "0x05",
+      "open_sram_entry": "0x2F9D",
+      "open_sram_guard_patch_offset": null,
+      "output_sha1": "cb1b743721fa3dcde29d7bf214c94c11ea6f1636",
+      "output_sha256": "cc3b7eb8046a84e55e5309dbdf0c95a3de5c430d25940c5d51452055fa313aac"
+    },
+    "en_rev0": {
+      "filename": "Pokemon - Crystal Version (USA, Europe).gbc",
+      "game_code": "BYTE",
+      "revision": 0,
+      "input_sha1": "f4cd194bdee0d04ca4eac29e09b8e4e9d818c133",
+      "input_sha256": "d6702e353dcbe2d2c69183046c878ef13a0dae4006e8cdff521cca83dd1582fe",
+      "input_rom_size_code": "0x06",
+      "input_ram_size_code": "0x03",
+      "open_sram_entry": "0x2FD1",
+      "open_sram_guard_patch_offset": "0x2FCC",
+      "output_sha1": "f693e9a4977670af0df821911b9278ab02943aeb",
+      "output_sha256": "fcfba9a3676bcf4c85d531304f05b6fb918fc591a919cdb060ccc49055fa9c44"
+    },
+    "en_rev_a": {
+      "filename": "Pokemon - Crystal Version (USA, Europe) (Rev A).gbc",
+      "game_code": "BYTE",
+      "revision": 1,
+      "input_sha1": "f2f52230b536214ef7c9924f483392993e226cfb",
+      "input_sha256": "fdcc3c8c43813cf8731fc037d2a6d191bac75439c34b24ba1c27526e6acdc8a2",
+      "input_rom_size_code": "0x06",
+      "input_ram_size_code": "0x03",
+      "open_sram_entry": "0x2FD1",
+      "open_sram_guard_patch_offset": "0x2FCC",
+      "output_sha1": "c6993b5d74f8d3036051e8c6f70e890ea1290e1f",
+      "output_sha256": "b8cf589d09e4ded8ba2e7c888991c5262f766b6b033e3bbae3e43cfbefebcfb6"
+    },
+    "fr_rev0": {
+      "filename": "Pokemon - Version Cristal (France).gbc",
+      "game_code": "BYTF",
+      "revision": 0,
+      "input_sha1": "c055992b16b7399c687647725cdd1f4f13a2f75c",
+      "input_sha256": "178b0da870a3cc58414940412eb6473f515b8941cb83d81a1a42d05ca82749e7",
+      "input_rom_size_code": "0x06",
+      "input_ram_size_code": "0x03",
+      "open_sram_entry": "0x2FBE",
+      "open_sram_guard_patch_offset": "0x2FB9",
+      "output_sha1": "563fe1d053590ee84110cf7a48b779565d9d6b12",
+      "output_sha256": "fc8c30aa3b1ccc28ccfa3c3680a63832a269b4de9e96db35f9e61c4ba1116d9a"
+    },
+    "de_rev0": {
+      "filename": "Pokemon - Kristall-Edition (Germany).gbc",
+      "game_code": "BYTD",
+      "revision": 0,
+      "input_sha1": "accb584293ba056152f1fd908439b019017ff2fe",
+      "input_sha256": "22c0dfec9ce004dceebe280d71fa2579fa376064f70284bbf46322e163aa1160",
+      "input_rom_size_code": "0x06",
+      "input_ram_size_code": "0x03",
+      "open_sram_entry": "0x2FBB",
+      "open_sram_guard_patch_offset": "0x2FB6",
+      "output_sha1": "0a68a9938459e2fb70a95ede5f9573c3a0ad6378",
+      "output_sha256": "9e1251a6ab70fe1bb433c0e665298dece008a1be6f8690a0ebda7be5bc09f2d2"
+    },
+    "it_rev0": {
+      "filename": "Pokemon - Versione Cristallo (Italy).gbc",
+      "game_code": "BYTI",
+      "revision": 0,
+      "input_sha1": "6cee05e5b95beeae74b8365ad18ec4a07a8c4af8",
+      "input_sha256": "2592aef20701fa1d5df5cf3343ffb4293092c911177868fa4a94698c27f7be89",
+      "input_rom_size_code": "0x06",
+      "input_ram_size_code": "0x03",
+      "open_sram_entry": "0x2FBF",
+      "open_sram_guard_patch_offset": "0x2FBA",
+      "output_sha1": "a0e581c2c2dc89bd83d4babd448e75c9d23a2c30",
+      "output_sha256": "0d02fe68e8803023228d16b5b7031d727de6fd7888dd2c82d6d9c1e640e461ed"
+    },
+    "es_rev0": {
+      "filename": "Pokemon - Edicion Cristal (Spain).gbc",
+      "game_code": "BYTS",
+      "revision": 0,
+      "input_sha1": "889a06fc0bb863666865aa69def0adf97945ac2a",
+      "input_sha256": "4aacb5b3ac7a741d99f507e7c31393c015dea26a3ce8876021c50e7c761c1141",
+      "input_rom_size_code": "0x06",
+      "input_ram_size_code": "0x03",
+      "open_sram_entry": "0x2FBB",
+      "open_sram_guard_patch_offset": "0x2FB6",
+      "output_sha1": "a7bac97de1f688eca026856b12b4060cfb5c0438",
+      "output_sha256": "0e5dd693c4ad4ffc06f7191238ad7375bb5a3f3ae898e35aa1fe2cb23a7234de"
+    }
+  }
+}
