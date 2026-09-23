@@ -51,6 +51,16 @@ def verify(rom: Path, sym_path: Path) -> None:
         "CrystalSetVariantProfileID",
         "CrystalGetAbilityState",
         "CrystalSetAbilityState",
+        "CrystalInitExtendedSaveCore",
+        "CrystalValidateExtendedSaveCore",
+        "CrystalEnsureExtendedSaveCore",
+        "CrystalGetPartySidecarEntry",
+        "CrystalGetCurrentPartySpeciesID",
+        "CrystalSetCurrentPartySpeciesID",
+        "CrystalGetCurrentPartyHeldItemID",
+        "CrystalSetCurrentPartyHeldItemID",
+        "CrystalGetCurrentPartyMoveID",
+        "CrystalSetCurrentPartyMoveID",
     ):
         bank, address = sym.get(name, (-1, -1))
         if bank != 0x80 or not (0x4000 <= address < 0x8000):
