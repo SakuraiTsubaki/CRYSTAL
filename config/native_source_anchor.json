@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "project": "CRYSTAL",
+  "source_anchor": {
+    "repository": "pret/pokecrystal",
+    "ref": "e058e4f50b3bbf7377e036b81c25a72c54656c5c",
+    "rgbds_version": "v1.0.4",
+    "role": "English Rev0/RevA byte-exact structural build anchor; Japanese BXTJ remains origin/master ROM reference"
+  },
+  "baseline_outputs": {
+    "rev0": {
+      "target": "crystal",
+      "filename": "pokecrystal.gbc",
+      "sha1": "f4cd194bdee0d04ca4eac29e09b8e4e9d818c133"
+    },
+    "revA": {
+      "target": "crystal11",
+      "filename": "pokecrystal11.gbc",
+      "sha1": "f2f52230b536214ef7c9924f483392993e226cfb"
+    }
+  },
+  "stage0_source_transform": {
+    "num_sram_banks": 8,
+    "ram_size_code": "0x05",
+    "rom_size_code": "0x07",
+    "output_bytes": 4194304,
+    "high_half_fill": "0xFF",
+    "stadium_domain_bytes": 2097152,
+    "compare_to_binary_transformer": true
+  }
+}
