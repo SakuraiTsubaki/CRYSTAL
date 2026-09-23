@@ -54,6 +54,7 @@ DEF CRYSTAL_EXT_MAX_BOXES        EQU NUM_BOXES
 DEF CRYSTAL_EXT_MAX_MONS_PER_BOX EQU MONS_PER_BOX_JP
 DEF CRYSTAL_EXT_MON_SLOTS        EQU CRYSTAL_EXT_MAX_BOXES * CRYSTAL_EXT_MAX_MONS_PER_BOX + PARTY_LENGTH
 
+DEF CRYSTAL_EXT_SCHEMA_VERSION  EQU 1
 DEF CRYSTAL_EXT_HEADER_SIZE      EQU 32
 DEF CRYSTAL_EXT_MON_ENTRY_SIZE   EQU 9
 DEF CRYSTAL_EXT_SPECIES_HI       EQU 0
@@ -142,6 +143,40 @@ INCLUDE "engine/pokemon/extended_ids.asm"
 
 SECTION "CRYSTAL Expansion End", ROMX[$7fff], BANK[$ff]
 \tdb $ff
+""",
+    )
+
+    replace_once(
+        root / "engine/menus/intro_menu.asm",
+        """NewGame:
+\txor a
+\tld [wDebugFlags], a
+\tcall ResetWRAM
+\tcall NewGame_ClearTilemapEtc
+""",
+        """NewGame:
+\txor a
+\tld [wDebugFlags], a
+\tcall ResetWRAM
+\tfarcall CrystalInitExtendedSaveCore
+\tcall NewGame_ClearTilemapEtc
+""",
+    )
+
+    replace_once(
+        root / "engine/menus/intro_menu.asm",
+        """Continue:
+\tfarcall TryLoadSaveFile
+\tjr c, .FailToLoad
+\tfarcall _LoadData
+\tcall LoadStandardMenuHeader
+""",
+        """Continue:
+\tfarcall TryLoadSaveFile
+\tjr c, .FailToLoad
+\tfarcall _LoadData
+\tfarcall CrystalEnsureExtendedSaveCore
+\tcall LoadStandardMenuHeader
 """,
     )
 
@@ -258,6 +293,80 @@ CrystalSetAbilityState::
 \tadd hl, de
 \tld [hl], a
 \tret
+
+CrystalInitExtendedSaveCore::
+; Initialize only the reserved CRYSTAL sidecar region. Existing Crystal/Mobile
+; SRAM outside B001..BF1A is not touched.
+\tld a, BANK(sCrystalExtSaveCore)
+\tcall OpenSRAM
+\tld hl, sCrystalExtSaveCore
+\tld bc, sCrystalExtSaveCoreEnd - sCrystalExtSaveCore
+\txor a
+\tcall ByteFill
+\tld hl, sCrystalExtMagic
+\tld a, $43
+\tld [hli], a
+\tld a, $58
+\tld [hli], a
+\tld a, $31
+\tld [hli], a
+\tld a, $30
+\tld [hli], a
+\tld a, CRYSTAL_EXT_SCHEMA_VERSION
+\tld [sCrystalExtSchemaVersion], a
+\tld a, CRYSTAL_EXT_MON_ENTRY_SIZE
+\tld [sCrystalExtEntrySize], a
+\tld a, LOW(CRYSTAL_EXT_MON_SLOTS)
+\tld [sCrystalExtSlotCount], a
+\tld a, HIGH(CRYSTAL_EXT_MON_SLOTS)
+\tld [sCrystalExtSlotCount + 1], a
+\tcall CloseSRAM
+\tret
+
+CrystalValidateExtendedSaveCore::
+; carry set = compatible sidecar header present
+\tld a, BANK(sCrystalExtSaveCore)
+\tcall OpenSRAM
+\tld hl, sCrystalExtMagic
+\tld a, [hli]
+\tcp $43
+\tjr nz, .bad
+\tld a, [hli]
+\tcp $58
+\tjr nz, .bad
+\tld a, [hli]
+\tcp $31
+\tjr nz, .bad
+\tld a, [hli]
+\tcp $30
+\tjr nz, .bad
+\tld a, [sCrystalExtSchemaVersion]
+\tcp CRYSTAL_EXT_SCHEMA_VERSION
+\tjr nz, .bad
+\tld a, [sCrystalExtEntrySize]
+\tcp CRYSTAL_EXT_MON_ENTRY_SIZE
+\tjr nz, .bad
+\tld a, [sCrystalExtSlotCount]
+\tcp LOW(CRYSTAL_EXT_MON_SLOTS)
+\tjr nz, .bad
+\tld a, [sCrystalExtSlotCount + 1]
+\tcp HIGH(CRYSTAL_EXT_MON_SLOTS)
+\tjr nz, .bad
+\tcall CloseSRAM
+\tscf
+\tret
+
+.bad
+\tcall CloseSRAM
+\tand a
+\tret
+
+CrystalEnsureExtendedSaveCore::
+; Retail/legacy saves have no CX10 header. Initializing an all-zero sidecar
+; makes every canonical ID equal its existing legacy low byte.
+\tcall CrystalValidateExtendedSaveCore
+\tret c
+\tjp CrystalInitExtendedSaveCore
 """,
         encoding="utf-8",
     )
