@@ -11,6 +11,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "config" / "engine_capacity.json"
 STORAGE = ROOT / "config" / "storage_profiles.json"
+STAGE0 = ROOT / "config" / "native_gbc_stage0.json"
 ROM_MANIFEST = ROOT / "research" / "evidence" / "rom_baselines.csv"
 SAVE_MANIFEST = ROOT / "research" / "evidence" / "save_baselines.csv"
 
@@ -36,6 +37,7 @@ def read_csv(path: Path) -> list[dict[str, str]]:
 def main() -> int:
     data = json.loads(CONFIG.read_text(encoding="utf-8"))
     storage = json.loads(STORAGE.read_text(encoding="utf-8"))
+    stage0 = json.loads(STAGE0.read_text(encoding="utf-8"))
     roms = read_csv(ROM_MANIFEST)
     saves = read_csv(SAVE_MANIFEST)
 
@@ -118,11 +120,41 @@ def main() -> int:
     if expanded.get("logical_rom_bank_id_bits", 0) < 16:
         fail("expanded logical ROM bank IDs must be at least 16-bit")
     if expanded.get("physical_expanded_mapper") != "TBD_AFTER_DATA_AND_ASSET_CENSUS":
-        fail("physical expanded mapper must remain evidence-gated until capacity census")
+        fail("long-term physical mapper must remain evidence-gated until capacity census")
+
+    if stage0.get("project") != "CRYSTAL":
+        fail("native GBC Stage 0 project mismatch")
+    target = stage0.get("target", {})
+    if target.get("platform") != "Game Boy Color":
+        fail("native Stage 0 must target Game Boy Color")
+    if target.get("rom_bytes") != 4194304 or target.get("rom_banks_16k") != 256:
+        fail("Stage 0 ROM target must be 4 MiB / 256 banks")
+    if target.get("sram_bytes") != 65536 or target.get("sram_banks_8k") != 8:
+        fail("Stage 0 SRAM target must be 64 KiB / 8 banks")
+    if target.get("rom_size_code") != "0x07" or target.get("ram_size_code") != "0x05":
+        fail("Stage 0 header target must be ROM code 0x07 / RAM code 0x05")
+    if not target.get("rtc_preserved"):
+        fail("Stage 0 must preserve RTC semantics")
+
+    releases = stage0.get("releases", {})
+    if len(releases) != 7:
+        fail("native Stage 0 must contain seven release profiles")
+    guarded = [p for p in releases.values() if p.get("open_sram_guard_patch_offset") is not None]
+    unguarded = [p for p in releases.values() if p.get("open_sram_guard_patch_offset") is None]
+    if len(guarded) != 6 or len(unguarded) != 1:
+        fail("expected six international CP $04->$08 patches and one Japanese unguarded profile")
+    if unguarded[0].get("game_code") != "BXTJ":
+        fail("only Japanese BXTJ may use the unguarded 64 KiB OpenSRAM profile")
+
+    save_policy = stage0.get("save_policy", {})
+    if save_policy.get("container_transform_enabled"):
+        fail("44-byte save-container mutation must remain disabled until raw bytes are re-verified")
 
     print("CRYSTAL evidence-driven capacity contract: OK")
     print("ROM baselines: 7 verified / checksums OK")
-    print("Save metadata: 7 observed / raw-byte offsets still unlocked")
+    print("Native Stage 0: 4 MiB ROM / 64 KiB SRAM / RTC retained")
+    print("OpenSRAM: JP already 8-bank capable; 6 international profiles patch CP $04 -> CP $08")
+    print("Save metadata: 7 observed / 44-byte container mutation still locked")
     print("Runtime IDs: 16-bit / logical bank IDs: 16-bit")
     return 0
 
