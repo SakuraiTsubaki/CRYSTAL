@@ -17,7 +17,14 @@
     "party_slots": 6,
     "safety_formula": "14 * 30 + 6",
     "slots": 426,
-    "note": "This combines independently observed source maxima to reserve capacity; it does not claim that Japanese Crystal stores 14 boxes of 30."
+    "note": "This combines independently observed source maxima to reserve capacity; it does not claim that Japanese Crystal stores 14 boxes of 30.",
+    "box_slot_reservation": {
+      "formula": "box_index * 30 + mon_index",
+      "box_slot_range": "0..419",
+      "note": "30 slots are reserved per box; international 20-mon boxes leave 10 reserved sidecar entries unused."
+    },
+    "party_slot_base": 420,
+    "party_slot_range": "420..425"
   },
   "sidecar": {
     "sram_bank": 4,
@@ -38,6 +45,12 @@
       "move4_high_u8": 5,
       "variant_profile_u16_le": 6,
       "ability_state_u8": 8
+    },
+    "header": {
+      "magic": "CX10",
+      "schema_version": 1,
+      "initialization": "NewGame initializes; Continue validates and zero-initializes legacy saves without CX10",
+      "legacy_migration": "all-zero high bytes preserve existing u8 IDs as canonical u16 values"
     }
   },
   "runtime": {
@@ -52,8 +65,18 @@
       "CrystalGetVariantProfileID",
       "CrystalSetVariantProfileID",
       "CrystalGetAbilityState",
-      "CrystalSetAbilityState"
+      "CrystalSetAbilityState",
+      "CrystalInitExtendedSaveCore",
+      "CrystalValidateExtendedSaveCore",
+      "CrystalEnsureExtendedSaveCore",
+      "CrystalGetPartySidecarEntry",
+      "CrystalGetCurrentPartySpeciesID",
+      "CrystalSetCurrentPartySpeciesID",
+      "CrystalGetCurrentPartyHeldItemID",
+      "CrystalSetCurrentPartyHeldItemID",
+      "CrystalGetCurrentPartyMoveID",
+      "CrystalSetCurrentPartyMoveID"
     ]
   },
-  "status": "implemented-storage-and-abi-not-yet-wired-to-all-consumers"
+  "status": "implemented-sidecar-lifecycle-and-party-bridge"
 }
