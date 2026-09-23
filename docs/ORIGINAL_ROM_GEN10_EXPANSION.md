@@ -37,11 +37,16 @@ FE 04       CP $04
 
 followed by the SRAM/RTC enable and `LD [$4000], A` bank selection.
 
-For the MBC30-class 64 KiB target, Stage 0 changes the immediate bound only:
+For the MBC30-class 64 KiB target, Stage 0 changes the OpenSRAM bound:
 
 ```text
 CP $04 -> CP $08
 ```
+
+There is a second required international change: retail `EmptyAllSRAMBanks` is four
+unrolled calls for banks 0..3. Stage 0 replaces those 21 bytes with an **equal-length**
+loop over banks 0..7. Equal length matters: code and data after the routine keep their
+retail addresses. Japanese Crystal already clears all eight SRAM banks and is left unchanged.
 
 Release-specific byte offsets are stored in `config/native_gbc_stage0.json` and are checked
 before mutation. A mismatching ROM is refused.
