@@ -145,6 +145,10 @@ def main() -> int:
         fail("expected six international CP $04->$08 patches and one Japanese unguarded profile")
     if unguarded[0].get("game_code") != "BXTJ":
         fail("only Japanese BXTJ may use the unguarded 64 KiB OpenSRAM profile")
+    if any(not p.get("empty_all_sram_patch") for p in guarded):
+        fail("all six international profiles must patch EmptyAllSRAMBanks for banks 0..7")
+    if unguarded[0].get("empty_all_sram_patch"):
+        fail("Japanese profile already clears eight SRAM banks and must not receive the international initializer patch")
 
     save_policy = stage0.get("save_policy", {})
     if save_policy.get("container_transform_enabled"):
@@ -154,6 +158,7 @@ def main() -> int:
     print("ROM baselines: 7 verified / checksums OK")
     print("Native Stage 0: 4 MiB ROM / 64 KiB SRAM / RTC retained")
     print("OpenSRAM: JP already 8-bank capable; 6 international profiles patch CP $04 -> CP $08")
+    print("SRAM initialization: JP already clears 8 banks; 6 international profiles use layout-stable 0..7 loop")
     print("Save metadata: 7 observed / 44-byte container mutation still locked")
     print("Runtime IDs: 16-bit / logical bank IDs: 16-bit")
     return 0
