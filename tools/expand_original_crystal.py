@@ -23,6 +23,13 @@ BANKSWITCH_SIGNATURE = bytes.fromhex("E0 9D EA 00 20 C9")
 OPEN_SRAM_BODY = bytes.fromhex("F5 3E 01 EA 00 60 3E 0A EA 00 00 F1 EA 00 40 C9")
 OPEN_SRAM_GUARD_4 = bytes.fromhex("FE 04 38 02 18 10")
 OPEN_SRAM_GUARD_8 = bytes.fromhex("FE 08 38 02 18 10")
+EMPTY_ALL_SRAM_OFFSET = 0x4CF1F
+EMPTY_ALL_SRAM_ORIGINAL = bytes.fromhex(
+    "3E 00 CD 34 4F 3E 01 CD 34 4F 3E 02 CD 34 4F 3E 03 CD 34 4F C9"
+)
+EMPTY_ALL_SRAM_PATCH = bytes.fromhex(
+    "AF F5 CD 34 4F F1 3C FE 08 38 F6 AF C9 00 00 00 00 00 00 00 00"
+)
 
 CART_MBC3_RTC_RAM_BATTERY = 0x10
 ROM_SIZE_2M = 0x06
@@ -220,6 +227,18 @@ def _expand_rom_with_profile(data: bytes, release_id: str, profile: dict) -> tup
             "before": "0x04",
             "after": "0x08",
             "reason": "allow MBC30 SRAM banks 0..7",
+        })
+
+        if out[EMPTY_ALL_SRAM_OFFSET:EMPTY_ALL_SRAM_OFFSET + len(EMPTY_ALL_SRAM_ORIGINAL)] != EMPTY_ALL_SRAM_ORIGINAL:
+            raise ValueError(
+                f"{release_id}: unexpected four-bank EmptyAllSRAMBanks routine "
+                f"at {EMPTY_ALL_SRAM_OFFSET:#x}"
+            )
+        out[EMPTY_ALL_SRAM_OFFSET:EMPTY_ALL_SRAM_OFFSET + len(EMPTY_ALL_SRAM_PATCH)] = EMPTY_ALL_SRAM_PATCH
+        patches.append({
+            "offset": EMPTY_ALL_SRAM_OFFSET,
+            "bytes": len(EMPTY_ALL_SRAM_PATCH),
+            "reason": "clear all eight MBC30 SRAM banks without shifting following code",
         })
 
     out.extend(b"\xFF" * (ROM_TARGET_BYTES - len(out)))
