@@ -52,7 +52,8 @@ def main() -> int:
 ; asserting that either retail release uses the combined maximum.
 DEF CRYSTAL_EXT_MAX_BOXES        EQU NUM_BOXES
 DEF CRYSTAL_EXT_MAX_MONS_PER_BOX EQU MONS_PER_BOX_JP
-DEF CRYSTAL_EXT_MON_SLOTS        EQU CRYSTAL_EXT_MAX_BOXES * CRYSTAL_EXT_MAX_MONS_PER_BOX + PARTY_LENGTH
+DEF CRYSTAL_EXT_PARTY_SLOT_BASE  EQU CRYSTAL_EXT_MAX_BOXES * CRYSTAL_EXT_MAX_MONS_PER_BOX
+DEF CRYSTAL_EXT_MON_SLOTS        EQU CRYSTAL_EXT_PARTY_SLOT_BASE + PARTY_LENGTH
 
 DEF CRYSTAL_EXT_SCHEMA_VERSION  EQU 1
 DEF CRYSTAL_EXT_HEADER_SIZE      EQU 32
@@ -293,6 +294,109 @@ CrystalSetAbilityState::
 \tadd hl, de
 \tld [hl], a
 \tret
+
+CrystalGetPartySidecarEntry::
+; a = party index 0..5
+; returns de = sidecar entry address (SRAM bank 4 must be opened by caller)
+	ld de, sCrystalExtMonEntries + CRYSTAL_EXT_PARTY_SLOT_BASE * CRYSTAL_EXT_MON_ENTRY_SIZE
+	and a
+	ret z
+.loop
+	ld hl, CRYSTAL_EXT_MON_ENTRY_SIZE
+	add hl, de
+	ld d, h
+	ld e, l
+	dec a
+	jr nz, .loop
+	ret
+
+CrystalGetCurrentPartySpeciesID::
+; returns bc = canonical u16 species ID
+	ld a, MON_SPECIES
+	call GetPartyParamLocation
+	push hl
+	ld a, [wCurPartyMon]
+	call CrystalGetPartySidecarEntry
+	ld a, BANK(sCrystalExtSaveCore)
+	call OpenSRAM
+	pop hl
+	call CrystalGetSpeciesID
+	call CloseSRAM
+	ret
+
+CrystalSetCurrentPartySpeciesID::
+; bc = canonical u16 species ID
+	ld a, MON_SPECIES
+	call GetPartyParamLocation
+	push hl
+	ld a, [wCurPartyMon]
+	call CrystalGetPartySidecarEntry
+	ld a, BANK(sCrystalExtSaveCore)
+	call OpenSRAM
+	pop hl
+	call CrystalSetSpeciesID
+	call CloseSRAM
+	ret
+
+CrystalGetCurrentPartyHeldItemID::
+; returns bc = canonical u16 item ID
+	ld a, MON_SPECIES
+	call GetPartyParamLocation
+	push hl
+	ld a, [wCurPartyMon]
+	call CrystalGetPartySidecarEntry
+	ld a, BANK(sCrystalExtSaveCore)
+	call OpenSRAM
+	pop hl
+	call CrystalGetHeldItemID
+	call CloseSRAM
+	ret
+
+CrystalSetCurrentPartyHeldItemID::
+; bc = canonical u16 item ID
+	ld a, MON_SPECIES
+	call GetPartyParamLocation
+	push hl
+	ld a, [wCurPartyMon]
+	call CrystalGetPartySidecarEntry
+	ld a, BANK(sCrystalExtSaveCore)
+	call OpenSRAM
+	pop hl
+	call CrystalSetHeldItemID
+	call CloseSRAM
+	ret
+
+CrystalGetCurrentPartyMoveID::
+; a = move slot 0..3; returns bc = canonical u16 move ID
+	push af
+	ld a, MON_SPECIES
+	call GetPartyParamLocation
+	push hl
+	ld a, [wCurPartyMon]
+	call CrystalGetPartySidecarEntry
+	ld a, BANK(sCrystalExtSaveCore)
+	call OpenSRAM
+	pop hl
+	pop af
+	call CrystalGetMoveID
+	call CloseSRAM
+	ret
+
+CrystalSetCurrentPartyMoveID::
+; a = move slot 0..3, bc = canonical u16 move ID
+	push af
+	ld a, MON_SPECIES
+	call GetPartyParamLocation
+	push hl
+	ld a, [wCurPartyMon]
+	call CrystalGetPartySidecarEntry
+	ld a, BANK(sCrystalExtSaveCore)
+	call OpenSRAM
+	pop hl
+	pop af
+	call CrystalSetMoveID
+	call CloseSRAM
+	ret
 
 CrystalInitExtendedSaveCore::
 ; Initialize only the reserved CRYSTAL sidecar region. Existing Crystal/Mobile
