@@ -13,21 +13,29 @@
     "sram_banks_8k": 8,
     "ram_size_code": "0x05",
     "padding_byte": "0xFF",
-    "rtc_preserved": true
+    "rtc_preserved": true,
+    "stadium_metadata_regenerated": true,
+    "stadium_domain_rom_banks_16k": 128
   },
   "signatures": {
     "bankswitch_offset": "0x0010",
     "bankswitch_bytes": "E0 9D EA 00 20 C9",
     "open_sram_enable_select_write_bytes": "F5 3E 01 EA 00 60 3E 0A EA 00 00 F1 EA 00 40 C9",
     "international_open_sram_guard_bytes": "FE 04 38 02 18 10",
-    "international_open_sram_guard_patch": "04 -> 08"
+    "international_open_sram_guard_patch": "04 -> 08",
+    "stadium_n64ps3_offset": "0x1FFDF8",
+    "stadium_base_offset": "0x1FFDE0",
+    "stadium_policy": "preserve retail base-match bitmap for banks 1..127, clear bank 0 match bit after header/OpenSRAM mutation, regenerate base CRC and N64PS3 half-bank checksums"
   },
   "save_policy": {
     "raw_international_sram_input_bytes": 32768,
     "raw_japanese_sram_input_bytes": 65536,
     "expanded_sram_output_bytes": 65536,
     "new_sram_banks_fill_byte": "0x00",
-    "container_sizes_observed": [32812, 65580],
+    "container_sizes_observed": [
+      32812,
+      65580
+    ],
     "container_extra_bytes_observed": 44,
     "container_transform_enabled": false,
     "reason": "the 44 extra bytes have not been re-read byte-for-byte in the current evidence set, so their placement/semantics are not assumed"
@@ -56,8 +64,8 @@
       "input_ram_size_code": "0x03",
       "open_sram_entry": "0x2FD1",
       "open_sram_guard_patch_offset": "0x2FCC",
-      "output_sha1": "f693e9a4977670af0df821911b9278ab02943aeb",
-      "output_sha256": "fcfba9a3676bcf4c85d531304f05b6fb918fc591a919cdb060ccc49055fa9c44"
+      "output_sha1": "6afa236c481beb2a4900ad99cd2a1fdae25ffb3f",
+      "output_sha256": "3e7bcc3058af6de334c87678b0400a7088f913534531f8817ac65294d4659e9e"
     },
     "en_rev_a": {
       "filename": "Pokemon - Crystal Version (USA, Europe) (Rev A).gbc",
@@ -69,8 +77,8 @@
       "input_ram_size_code": "0x03",
       "open_sram_entry": "0x2FD1",
       "open_sram_guard_patch_offset": "0x2FCC",
-      "output_sha1": "c6993b5d74f8d3036051e8c6f70e890ea1290e1f",
-      "output_sha256": "b8cf589d09e4ded8ba2e7c888991c5262f766b6b033e3bbae3e43cfbefebcfb6"
+      "output_sha1": "29eb25bf8315660e32a1c8d3b637206175d6e394",
+      "output_sha256": "6a2f58389918a7b398445f6fb307460026ca3500c9b22c7ce649ee21daa5069b"
     },
     "fr_rev0": {
       "filename": "Pokemon - Version Cristal (France).gbc",
@@ -82,8 +90,8 @@
       "input_ram_size_code": "0x03",
       "open_sram_entry": "0x2FBE",
       "open_sram_guard_patch_offset": "0x2FB9",
-      "output_sha1": "563fe1d053590ee84110cf7a48b779565d9d6b12",
-      "output_sha256": "fc8c30aa3b1ccc28ccfa3c3680a63832a269b4de9e96db35f9e61c4ba1116d9a"
+      "output_sha1": "55f59440f6333fc6283dda74ccb3d43bc97e6d81",
+      "output_sha256": "a825340604e60d4c2e7d783f3d9f7e9ea76cb102c04534ec37d4e6324734d9f8"
     },
     "de_rev0": {
       "filename": "Pokemon - Kristall-Edition (Germany).gbc",
@@ -95,8 +103,8 @@
       "input_ram_size_code": "0x03",
       "open_sram_entry": "0x2FBB",
       "open_sram_guard_patch_offset": "0x2FB6",
-      "output_sha1": "0a68a9938459e2fb70a95ede5f9573c3a0ad6378",
-      "output_sha256": "9e1251a6ab70fe1bb433c0e665298dece008a1be6f8690a0ebda7be5bc09f2d2"
+      "output_sha1": "d00718c7b61280b765aa174624347530c00bbe46",
+      "output_sha256": "a5a2f2747d913312b4609ff8f3f83c8ce8dd033b3fd3cbdf44f34951323cf32e"
     },
     "it_rev0": {
       "filename": "Pokemon - Versione Cristallo (Italy).gbc",
@@ -108,8 +116,8 @@
       "input_ram_size_code": "0x03",
       "open_sram_entry": "0x2FBF",
       "open_sram_guard_patch_offset": "0x2FBA",
-      "output_sha1": "a0e581c2c2dc89bd83d4babd448e75c9d23a2c30",
-      "output_sha256": "0d02fe68e8803023228d16b5b7031d727de6fd7888dd2c82d6d9c1e640e461ed"
+      "output_sha1": "65bda8dbf45ce86b901e0f3fa9e372135c18c0c2",
+      "output_sha256": "98713c62ea7cdfb047e4518da910e8fa6fd0d4c5d85f73aa54d2a33c796321d0"
     },
     "es_rev0": {
       "filename": "Pokemon - Edicion Cristal (Spain).gbc",
@@ -121,8 +129,8 @@
       "input_ram_size_code": "0x03",
       "open_sram_entry": "0x2FBB",
       "open_sram_guard_patch_offset": "0x2FB6",
-      "output_sha1": "a7bac97de1f688eca026856b12b4060cfb5c0438",
-      "output_sha256": "0e5dd693c4ad4ffc06f7191238ad7375bb5a3f3ae898e35aa1fe2cb23a7234de"
+      "output_sha1": "8b4141739124bb6cc6784a3b43973bf696bc2c06",
+      "output_sha256": "9b3b2fcead1a3c42981f1d560f790c174f8c0dbcf8f4df60a2cf6860e3823711"
     }
   }
 }
