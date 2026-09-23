@@ -26,6 +26,13 @@ def make_rom(*, ram_code: int, guarded: bool) -> tuple[bytes, dict]:
     data[0x14C] = 0
     data[0x10:0x16] = mod.BANKSWITCH_SIGNATURE
 
+    # Seed Crystal's retail Stadium metadata area so the expansion path
+    # exercises the same preconditions as the real ROM family.
+    data[mod.STADIUM_N64_OFFSET:mod.STADIUM_N64_OFFSET + 6] = mod.STADIUM_N64_HEADER
+    if guarded:
+        data[mod.STADIUM_BASE_OFFSET:mod.STADIUM_BASE_OFFSET + 6] = b"base\x01\x00"
+        data[mod.STADIUM_BASE_OFFSET + 8:mod.STADIUM_BASE_OFFSET + 24] = bytes([0xFF] * 16)
+
     open_sram = 0x3000
     data[open_sram:open_sram + len(mod.OPEN_SRAM_BODY)] = mod.OPEN_SRAM_BODY
     guard_patch = None
@@ -53,6 +60,9 @@ def test_japan_rom() -> None:
     assert out[0x149] == 0x05
     assert report["patches"] == []
     assert out[0x200000:] == b"\xFF" * 0x200000
+    assert out[mod.STADIUM_N64_OFFSET:mod.STADIUM_N64_OFFSET + 6] == b"N64PS3"
+    assert out[mod.STADIUM_BASE_OFFSET:mod.STADIUM_BASE_OFFSET + 24] == bytes(24)
+    assert report["stadium_metadata_regenerated"] is True
     mod.validate_checksums(out)
 
 
@@ -63,6 +73,12 @@ def test_international_rom() -> None:
     assert out[guard_immediate] == 0x08
     assert len(report["patches"]) == 1
     assert out[0x149] == 0x05
+    assert out[mod.STADIUM_N64_OFFSET:mod.STADIUM_N64_OFFSET + 6] == b"N64PS3"
+    assert out[mod.STADIUM_BASE_OFFSET:mod.STADIUM_BASE_OFFSET + 6] == b"base\x01\x00"
+    # Bank 0 no longer matches the retail base after header/OpenSRAM changes.
+    assert out[mod.STADIUM_BASE_OFFSET + 8] == 0xFE
+    assert out[mod.STADIUM_BASE_OFFSET + 9:mod.STADIUM_BASE_OFFSET + 24] == bytes([0xFF] * 15)
+    assert report["stadium_metadata_regenerated"] is True
     mod.validate_checksums(out)
 
 
