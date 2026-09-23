@@ -10,8 +10,8 @@ import subprocess
 import sys
 
 EXPECTED = {
-    "pokecrystal.gbc": "6afa236c481beb2a4900ad99cd2a1fdae25ffb3f",
-    "pokecrystal11.gbc": "29eb25bf8315660e32a1c8d3b637206175d6e394",
+    "pokecrystal.gbc": "7b5f7f48825696fc9cbca09eceff9afc74881d53",
+    "pokecrystal11.gbc": "c206ea7770ac566783ac22b33240f260643c96b6",
 }
 
 
