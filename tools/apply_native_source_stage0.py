@@ -45,6 +45,32 @@ def main() -> int:
     )
 
     replace_once(
+        root / "engine/menus/empty_sram.asm",
+        """EmptyAllSRAMBanks:
+for x, NUM_SRAM_BANKS
+	ld a, x
+	call .EmptyBank
+endr
+	ret
+""",
+        """EmptyAllSRAMBanks:
+; CRYSTAL: keep this routine exactly 21 bytes like retail international
+; while expanding the bank range from 0..3 to 0..7.
+	xor a
+.loop
+	push af
+	call .EmptyBank
+	pop af
+	inc a
+	cp NUM_SRAM_BANKS
+	jr c, .loop
+	xor a
+	ret
+	ds 8, 0
+""",
+    )
+
+    replace_once(
         root / "Makefile",
         "RGBFIXFLAGS += -Cjv -t PM_CRYSTAL -k 01 -l 0x33 -m MBC3+TIMER+RAM+BATTERY -r 3 -p 0",
         "RGBFIXFLAGS += -Cjv -t PM_CRYSTAL -k 01 -l 0x33 -m MBC3+TIMER+RAM+BATTERY -r 5 -p 0",
