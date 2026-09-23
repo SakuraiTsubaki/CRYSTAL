@@ -1,0 +1,81 @@
+name: Build native Crystal source Stage 0
+
+on:
+  push:
+    paths:
+      - "config/native_source_anchor.json"
+      - "tools/apply_native_source_stage0.py"
+      - "tools/verify_native_source_stage0.py"
+      - "tools/expand_original_crystal.py"
+      - "config/native_gbc_stage0.json"
+      - ".github/workflows/native-source-stage0.yml"
+  pull_request:
+    paths:
+      - "config/native_source_anchor.json"
+      - "tools/apply_native_source_stage0.py"
+      - "tools/verify_native_source_stage0.py"
+      - "tools/expand_original_crystal.py"
+      - "config/native_gbc_stage0.json"
+      - ".github/workflows/native-source-stage0.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout CRYSTAL
+        uses: actions/checkout@v4
+
+      - name: Checkout pinned Crystal source
+        uses: actions/checkout@v4
+        with:
+          repository: pret/pokecrystal
+          ref: e058e4f50b3bbf7377e036b81c25a72c54656c5c
+          path: _source/pokecrystal
+          fetch-depth: 1
+
+      - name: Checkout RGBDS 1.0.4
+        uses: actions/checkout@v4
+        with:
+          repository: gbdev/rgbds
+          ref: v1.0.4
+          path: _source/rgbds
+          fetch-depth: 1
+
+      - name: Install RGBDS build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -yq bison libpng-dev pkg-config
+          sudo make -C _source/rgbds -j$(nproc) install
+
+      - name: Build byte-exact retail Rev0 and RevA anchors
+        working-directory: _source/pokecrystal
+        run: |
+          make -j$(nproc) crystal crystal11
+          echo "f4cd194bdee0d04ca4eac29e09b8e4e9d818c133  pokecrystal.gbc" | sha1sum -c -
+          echo "f2f52230b536214ef7c9924f483392993e226cfb  pokecrystal11.gbc" | sha1sum -c -
+          cp pokecrystal.gbc /tmp/crystal-retail-rev0.gbc
+          cp pokecrystal11.gbc /tmp/crystal-retail-reva.gbc
+          make tidy
+
+      - name: Apply native GBC Stage 0 source patch
+        run: |
+          python3 tools/apply_native_source_stage0.py _source/pokecrystal
+          git -C _source/pokecrystal diff --check
+          git -C _source/pokecrystal diff --stat
+
+      - name: Build expanded source Rev0 and RevA
+        working-directory: _source/pokecrystal
+        run: make -j$(nproc) crystal crystal11
+
+      - name: Build binary-transform reference outputs
+        run: |
+          python3 tools/expand_original_crystal.py rom /tmp/crystal-retail-rev0.gbc /tmp/crystal-binary-rev0.gbc
+          python3 tools/expand_original_crystal.py rom /tmp/crystal-retail-reva.gbc /tmp/crystal-binary-reva.gbc
+
+      - name: Verify source expansion byte-for-byte
+        run: |
+          python3 tools/verify_native_source_stage0.py \
+            _source/pokecrystal/pokecrystal.gbc \
+            _source/pokecrystal/pokecrystal11.gbc
+          cmp _source/pokecrystal/pokecrystal.gbc /tmp/crystal-binary-rev0.gbc
+          cmp _source/pokecrystal/pokecrystal11.gbc /tmp/crystal-binary-reva.gbc
