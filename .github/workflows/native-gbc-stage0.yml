@@ -1,0 +1,25 @@
+name: Validate native GBC Stage 0
+
+on:
+  push:
+    paths:
+      - "config/native_gbc_stage0.json"
+      - "tools/expand_original_crystal.py"
+      - "tools/test_expand_original_crystal.py"
+      - "docs/ORIGINAL_ROM_GEN10_EXPANSION.md"
+      - ".github/workflows/native-gbc-stage0.yml"
+  pull_request:
+    paths:
+      - "config/native_gbc_stage0.json"
+      - "tools/expand_original_crystal.py"
+      - "tools/test_expand_original_crystal.py"
+      - "docs/ORIGINAL_ROM_GEN10_EXPANSION.md"
+      - ".github/workflows/native-gbc-stage0.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test native GBC physical expansion
+        run: python3 tools/test_expand_original_crystal.py
