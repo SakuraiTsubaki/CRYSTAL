@@ -40,6 +40,10 @@ def make_rom(*, ram_code: int, guarded: bool) -> tuple[bytes, dict]:
         guard_start = open_sram - len(mod.OPEN_SRAM_GUARD_4)
         data[guard_start:open_sram] = mod.OPEN_SRAM_GUARD_4
         guard_patch = guard_start + 1
+        data[
+            mod.EMPTY_ALL_SRAM_OFFSET:
+            mod.EMPTY_ALL_SRAM_OFFSET + len(mod.EMPTY_ALL_SRAM_ORIGINAL)
+        ] = mod.EMPTY_ALL_SRAM_ORIGINAL
 
     data[0x14D] = mod.header_checksum(data)
     data[0x14E:0x150] = mod.global_checksum(data).to_bytes(2, "big")
@@ -71,7 +75,11 @@ def test_international_rom() -> None:
     guard_immediate = int(profile["open_sram_guard_patch_offset"], 16)
     out, report = mod._expand_rom_with_profile(data, "test_intl", profile)
     assert out[guard_immediate] == 0x08
-    assert len(report["patches"]) == 1
+    assert len(report["patches"]) == 2
+    assert out[
+        mod.EMPTY_ALL_SRAM_OFFSET:
+        mod.EMPTY_ALL_SRAM_OFFSET + len(mod.EMPTY_ALL_SRAM_PATCH)
+    ] == mod.EMPTY_ALL_SRAM_PATCH
     assert out[0x149] == 0x05
     assert out[mod.STADIUM_N64_OFFSET:mod.STADIUM_N64_OFFSET + 6] == b"N64PS3"
     assert out[mod.STADIUM_BASE_OFFSET:mod.STADIUM_BASE_OFFSET + 6] == b"base\x01\x00"
