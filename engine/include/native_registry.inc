@@ -1,13 +1,13 @@
 ; CRYSTAL native GBC canonical registry ABI
 ; Stage 1: all proven legacy Species/Move/Item table reads are redirected
-; into ROM bank $80 while legacy runtime IDs remain u8.
+; into ROM bank $81 while legacy runtime IDs remain u8.
 ;
 ; Stage 2 and later widen runtime identity access without moving these
 ; canonical registry entry points.
 
 DEF CRYSTAL_REGISTRY_ABI_VERSION EQU 1
 
-DEF CRYSTAL_REGISTRY_BANK EQU $80
+DEF CRYSTAL_REGISTRY_BANK EQU $81
 DEF CRYSTAL_REGISTRY_BANK_BYTES EQU $4000
 DEF CRYSTAL_REGISTRY_DIRECTORY_OFFSET EQU $0040
 DEF CRYSTAL_REGISTRY_ENTRY_BYTES EQU 16
