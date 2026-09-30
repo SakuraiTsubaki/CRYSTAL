@@ -3,12 +3,14 @@
 Status: **verified on all seven supplied Crystal ROMs**
 
 Stage 0 created a common 4 MiB ROM / 64 KiB SRAM MBC30-compatible envelope.
-Stage 1 uses the first new ROM bank, `$80`, to create a stable canonical data
+Bank `$80` is already owned by the native 16-bit identity ABI built from the pinned
+Crystal source, so the canonical data registry is deliberately placed in bank `$81`.
+Stage 1 uses the ROM bank `$81`, to create a stable canonical data
 boundary before runtime IDs themselves are widened.
 
 ## Registry bank
 
-Physical ROM offset: `0x200000`
+Physical ROM offset: `0x204000`
 
 CPU bank/address layout:
 
@@ -18,7 +20,7 @@ CPU bank/address layout:
 | Moves | 251 | 7 | `$6060` | 1,757 |
 | ItemAttributes | 256 | 7 | `$673D` | 1,792 |
 
-Header and directory occupy the beginning of bank `$80`.
+Header and directory occupy the beginning of bank `$81`.
 The complete Stage 1 seed uses 11,837 of 16,384 bytes, leaving 4,547 bytes.
 
 The directory declares a 16-bit canonical ID width even though Stage 1 intentionally
