@@ -19,8 +19,8 @@ def main() -> int:
         fail("unexpected stage id")
 
     reg=data["registry"]
-    if reg.get("bank")!="0x80" or reg.get("physical_offset")!="0x200000":
-        fail("canonical registry must remain in bank 0x80")
+    if reg.get("bank")!="0x81" or reg.get("physical_offset")!="0x204000":
+        fail("canonical registry must remain in bank 0x81; bank 0x80 is runtime ABI code")
     if reg.get("canonical_id_bits")!=16:
         fail("canonical registry IDs must be 16-bit")
     if reg.get("used_bytes_from_bank_start")!=11837 or reg.get("remaining_bytes")!=4547:
@@ -73,7 +73,7 @@ def main() -> int:
         fail("Stage 2 widening boundary disappeared")
 
     print("CRYSTAL native GBC Stage 1 contract: OK")
-    print("CRYSREG bank 0x80 / BaseData + Moves + ItemAttributes / 7 raw-ROM outputs")
+    print("CRYSREG bank 0x81 / BaseData + Moves + ItemAttributes / 7 raw-ROM outputs")
     return 0
 
 if __name__=="__main__":
