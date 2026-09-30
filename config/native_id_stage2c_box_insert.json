@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "project": "CRYSTAL",
+  "stage": "native-gbc-id-sidecar-2c-legacy-box-insertions",
+  "depends_on": "config/native_id_stage2b_move.json",
+  "source_ref": "e058e4f50b3bbf7377e036b81c25a72c54656c5c",
+  "implemented_paths": [
+    "SendMonIntoBox front insertion: mirror legacy ShiftBoxMon in sidecar and zero the inserted high-ID entry",
+    "Bug Contest InsertPokemonIntoBox: mirror arbitrary insertion and zero the inserted high-ID entry"
+  ],
+  "initialization_rule": "legacy-only mon sources have canonical high bytes = 0; low bytes remain the existing Gen II IDs",
+  "future_rule": "future canonical >255 creation paths must call an explicit sidecar-seeding API instead of these legacy-zero insertion helpers",
+  "status": "implementation"
+}
