@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "project": "CRYSTAL",
+  "stage": "native-gbc-id-sidecar-2d-daycare",
+  "depends_on": "config/native_id_stage2c_box_insert.json",
+  "source_ref": "e058e4f50b3bbf7377e036b81c25a72c54656c5c",
+  "persistent_extension": {
+    "sram_bank": 4,
+    "start_expected": "0xBF1B",
+    "entries": 2,
+    "entry_bytes": 9,
+    "end_expected": "0xBF2D",
+    "reuses_existing_426_slot_indices": false
+  },
+  "migration": {
+    "header_flag_bit": 0,
+    "existing_stage1_save_policy": "if CX10 core is valid but Day-Care flag is clear, initialize only the 18 new Day-Care bytes and set the flag",
+    "preserve_existing_party_box_high_ids": true
+  },
+  "implemented_paths": [
+    "Day-Care Man deposit: selected party sidecar -> persistent DayCare entry 0 before party removal",
+    "Day-Care Lady deposit: selected party sidecar -> persistent DayCare entry 1 before party removal",
+    "Day-Care Man withdraw: entry 0 -> newly appended party sidecar then clear entry 0",
+    "Day-Care Lady withdraw: entry 1 -> newly appended party sidecar then clear entry 1"
+  ],
+  "status": "implementation"
+}
