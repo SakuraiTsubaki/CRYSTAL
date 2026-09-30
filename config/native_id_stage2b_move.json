@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "project": "CRYSTAL",
+  "stage": "native-gbc-id-sidecar-2b-move-without-mail",
+  "depends_on": "config/native_id_stage2_box.json",
+  "source_ref": "e058e4f50b3bbf7377e036b81c25a72c54656c5c",
+  "temp_sidecar_bytes": 9,
+  "temp_storage": {
+    "source": "ram/wram.asm",
+    "placement": "first 9 bytes of the existing 720-byte Bills PC scratch reservation",
+    "net_wram_growth_bytes": 0
+  },
+  "flows": [
+    "box -> temp sidecar before legacy box removal",
+    "party -> temp sidecar before legacy party removal",
+    "temp -> box insertion with right shift at wCurPartyMon",
+    "temp -> party insertion with right shift at wCurPartyMon",
+    "same-container moves preserve sidecar across remove/insert"
+  ],
+  "status": "implementation"
+}
