@@ -4,9 +4,9 @@
 Input is one of the seven verified retail Crystal ROMs. Stage 0 is applied first by
 tools/expand_original_crystal.py. Stage 1 then:
 
-- writes CRYSREG v1 into new ROM bank $80;
+- writes CRYSREG v1 into new ROM bank $81;
 - copies the verified legacy BaseData, Moves and ItemAttributes tables into it;
-- redirects every proven BaseData/ItemAttributes/Moves read to bank $80;
+- redirects every proven BaseData/ItemAttributes/Moves read to bank $81;
 - keeps legacy u8 ID semantics for this stage;
 - regenerates Crystal Stadium metadata and the Game Boy global checksum.
 
@@ -29,7 +29,7 @@ ROOT = Path(__file__).resolve().parents[1]
 STAGE0_CONFIG = ROOT / "config" / "native_gbc_stage0.json"
 STAGE1_CONFIG = ROOT / "config" / "native_gbc_stage1.json"
 
-REGISTRY_BANK = 0x80
+REGISTRY_BANK = 0x81
 REGISTRY_PHYS = REGISTRY_BANK * 0x4000
 REGISTRY_MAGIC = b"CRYSREG\0"
 REGISTRY_DIRECTORY_OFFSET = 0x40
