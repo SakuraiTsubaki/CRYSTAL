@@ -4,8 +4,8 @@
   "depends_on": "config/native_gbc_stage0.json",
   "source_reference": "pret/pokecrystal@5beda23ffa505f62e1dad7e3d7c214d1737b3358",
   "registry": {
-    "bank": "0x80",
-    "physical_offset": "0x200000",
+    "bank": "0x81",
+    "physical_offset": "0x204000",
     "magic": "CRYSREG\\0",
     "format_version": 1,
     "directory_offset": "0x0040",
@@ -40,7 +40,8 @@
     },
     "used_bytes_from_bank_start": 11837,
     "bank_bytes": 16384,
-    "remaining_bytes": 4547
+    "remaining_bytes": 4547,
+    "reserved_bank_0x80": "native 16-bit ID ABI code; see config/native_id_stage1.json"
   },
   "patch_policy": {
     "preserve_legacy_u8_semantics_in_stage1": true,
@@ -68,8 +69,8 @@
         "0x109C5D",
         "0x1F5C5B"
       ],
-      "output_sha1": "c9948607b5a05e7701c642443a3f945fba284159",
-      "output_sha256": "080289cc7868e2ca17eaefb8ededa23dc03616c2d8ae412beebe8657899d6e64"
+      "output_sha1": "37eb9797e28aa194095facb777c01b5083c94ed7",
+      "output_sha256": "5fbb9c595ec4f4da2d506eb57cf3d15e1ca6e160c09b8a585ba721603df6a7e0"
     },
     "en_rev0": {
       "source_offsets": {
@@ -86,8 +87,8 @@
         "move_bank_immediates": 16
       },
       "excluded_move_address_collisions": [],
-      "output_sha1": "e0fc265ed9e973adced8c1c1c04e8a5e59ff6bbc",
-      "output_sha256": "6dec46381f0146770df4e620d6dbaecb52f08845b5a42612da1b91734ac4cdc3"
+      "output_sha1": "bbde34e6495929109b669c419f5856048570a570",
+      "output_sha256": "298839d1df8a484fcf5b4e559f50cd9d9d97f4127f028a840ea10b18a9f2e26d"
     },
     "en_rev_a": {
       "source_offsets": {
@@ -104,8 +105,8 @@
         "move_bank_immediates": 16
       },
       "excluded_move_address_collisions": [],
-      "output_sha1": "8f3702e06da1779b02c355aa8e25d3dc84537f97",
-      "output_sha256": "a552516bf75c0f4545c2588dcd019c81a94c0c604e73a65056b64aa7b06fc976"
+      "output_sha1": "e889452bffcfe2a788795215cb36e3ade35762c0",
+      "output_sha256": "0f81d09bffae466e0450657480381b1908382778b6a66d9a480d639a34c8557a"
     },
     "fr_rev0": {
       "source_offsets": {
@@ -122,8 +123,8 @@
         "move_bank_immediates": 16
       },
       "excluded_move_address_collisions": [],
-      "output_sha1": "eb867c40940980541d8e34dae766a0b59f5802a1",
-      "output_sha256": "3305d78c7cf7d93bad33a3cff44253452feec7246e76f5764ea8e569c3e8176a"
+      "output_sha1": "82b27bd264bc3531155a13e200e151b2ff77ca83",
+      "output_sha256": "5a061ed4074892d98585566b56094fc083838d3176172d1b2b17184b1e3c8086"
     },
     "de_rev0": {
       "source_offsets": {
@@ -142,8 +143,8 @@
       "excluded_move_address_collisions": [
         "0x378FF"
       ],
-      "output_sha1": "915bc741485a52d3313dcab31a66ea3d7b308a5b",
-      "output_sha256": "f7818371fe8bc330851f5adbda657b1efa704541cd04fd707f03e3df6a5e327b"
+      "output_sha1": "585dd10b41f780a2351ec3db966ee2246086fdaa",
+      "output_sha256": "12b81dca81821b503e9f351a678af52a255d6509a5e2a3bb858c164442696b67"
     },
     "it_rev0": {
       "source_offsets": {
@@ -160,8 +161,8 @@
         "move_bank_immediates": 16
       },
       "excluded_move_address_collisions": [],
-      "output_sha1": "5d4d830bf5335b45bfc10d9775e15fc25c47da3b",
-      "output_sha256": "ee3b506a063ca4d55bba66d7c62447c93a9706ebc697a0b1596968d4444672a6"
+      "output_sha1": "49787caeff105f05f2dabe49f755864334ded639",
+      "output_sha256": "d1b89f3283ab72b374e73bd616bbecfd7e4a6558b1949f8f5ed477296685edfd"
     },
     "es_rev0": {
       "source_offsets": {
@@ -178,8 +179,8 @@
         "move_bank_immediates": 16
       },
       "excluded_move_address_collisions": [],
-      "output_sha1": "2ef067ab41609b884028326c4bfeca958b58d4c8",
-      "output_sha256": "9439b2a4bd3934a576c0a6e4a1a14ea267add49309c926e7e291536fb7970d19"
+      "output_sha1": "5caf331de166f9079f8a2c41997d2aa46aa54b98",
+      "output_sha256": "8528a00ba5b5ec507a37be7e18ab546133a3be409067d7d9bd97f36f0b42fd2a"
     }
   }
 }
