@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "project": "CRYSTAL",
+  "stage": "native-gbc-id-sidecar-2-box-lifecycle",
+  "depends_on": "config/native_id_stage1.json",
+  "source_ref": "e058e4f50b3bbf7377e036b81c25a72c54656c5c",
+  "code_bank": "0x80",
+  "sidecar_sram_bank": 4,
+  "box_mapping": {
+    "formula": "box_index * 30 + mon_index",
+    "box_index_range": "0..13",
+    "mon_index_range": "0..29",
+    "box_slots": "0..419",
+    "party_slots": "420..425"
+  },
+  "implemented_paths": [
+    "PC deposit party -> current box copies sidecar before source removal",
+    "PC withdraw current box -> party copies sidecar before source removal",
+    "party removal shifts following party sidecars left and clears tail",
+    "box removal/release shifts following current-box sidecars left and clears tail"
+  ],
+  "sram_bank_rule": {
+    "active_box_bank": 1,
+    "sidecar_bank": 4,
+    "helper_policy": "box helpers restore BANK(sBoxCount) before returning to legacy code"
+  },
+  "deferred_paths": [
+    "MOVE PKMN W/O MAIL uses wBufferMon and needs a temporary sidecar buffer",
+    "wild/gift direct SendMonIntoBox insertion needs right-shift plus zero/canonical source sidecar",
+    "day-care sidecar persistence",
+    "battle/link temporary identity transport"
+  ],
+  "status": "implementation"
+}
